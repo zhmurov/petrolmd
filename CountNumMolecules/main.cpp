@@ -6,7 +6,7 @@
 
 std::map<char, float> masses;
 
-void readMassesDB(string filename)
+void readMassesDB(std::string filename)
 {
     std::string line;
     std::ifstream file(filename);
@@ -39,6 +39,14 @@ void readMassesDB(string filename)
 
 float getMass(std::string compound)
 {
+    float totalMass = 0.0f;
+    char element = compound[0];
+    int number = 1;
+    if (compound.find_first_of("1234567890") == 1)
+    {
+        number = atoi(compound.substr(1, compound.find_first_of("CHI \t\r\n") + 1).c_str());
+    }
+    totalMass += masses[element]*number;
     return 0.0f;
 }
 
