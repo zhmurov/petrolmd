@@ -1,0 +1,7 @@
+COMPND  C5H12_ISO                                                         
+HETATM    1  C   CH3     1      -1.024   1.266  -0.270
+HETATM    2  C1  MB      2      -1.043  -1.235  -0.330
+HETATM    3  C   MB      2      -0.600  -0.005   0.464
+HETATM    4  C   CH2     3       0.921  -0.061   0.706
+HETATM    5  C   CH3     4       1.744   0.036  -0.570
+END   

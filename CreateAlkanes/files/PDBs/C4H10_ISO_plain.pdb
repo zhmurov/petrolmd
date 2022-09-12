@@ -1,0 +1,6 @@
+COMPND  C3H10_ISO
+HETATM    1  C   CH      1       0.000   0.000  -0.360                
+HETATM    2  C   CH3     2      -0.534   1.347   0.120                
+HETATM    3  C   CH3     3       1.434  -0.211   0.120                
+HETATM    4  C   CH3     4      -0.900  -1.136   0.120                
+END   
