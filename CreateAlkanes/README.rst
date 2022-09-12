@@ -5,6 +5,7 @@ Create PDB files
 ----------------
 
 .. code-block:: shell
+
     mkdir files
     cd files
     ../build/CreateAlkanes/create_alkanes
@@ -16,7 +17,7 @@ Make topologies
 
     bash ../CreateAlkanes/create_topologies.sh
 
-Build amd install GROMACS
+Build and install GROMACS
 =========================
 
 1. Get the code:
@@ -92,6 +93,7 @@ Building the system
 5. To create a 10nm x 10nm x 10nm box containing 1000 octane molecules with Packmol, create `C8H18_1000.inp` file with the following:
 
     .. code-block:: text
+
         tolerance 2.0
         filetype pdb
         output C8H18_1000.pdb
@@ -188,6 +190,7 @@ System preparation
 4. Production run:
 
     .. code-block:: shell
+
         $GMX grompp -f md.mdp -c npt.gro -p C8H18_1000.top -o md.tpr
         $GMX mdrun -deffnm md
 
