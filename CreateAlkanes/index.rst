@@ -10,12 +10,29 @@ Create PDB files
     cd files
     ../build/CreateAlkanes/create_alkanes
 
+Copy additional files, e.g. iso-butane and iso-pentane pdbs (see ``files/PDBs`` folder in this repo):
+
+.. code-block:: shell
+
+    cp ../CreateAlkanes/files/PDBs/C4H10_ISO.pdb .
+    cp ../CreateAlkanes/files/PDBs/C5H12_ISO.pdb .
+
 Make topologies
 ---------------
 
 .. code-block:: shell
 
     bash ../CreateAlkanes/create_topologies.sh
+
+This will create ``.itp`` files for all the coordinates that we have in the folder.
+
+.. code-block:: shell
+
+    ../build/CountNumMolecules/count_mols ../CountNumMolecules/files/yamburg_recomb.dat ../CountNumMolecules/files/atomic_weights.dat
+
+.. code-block:: shell
+
+    $PACKMOL < yamburg_packmol.inp
 
 Build and install GROMACS
 =========================
@@ -73,11 +90,14 @@ Building the system
     .. code-block:: shell
 
         cp C8H18.top C8H18.itp
-        sed -i -n '1,/pairs/p;/angles/,$p' C8H18.itp
-        sed -i '/; Include Position restraint file/,$d' C8H18.itp
-        sed -i 's/Other/C8H18/g' C8H18.itp
-        sed -i '/; Include forcefield parameters/d' C8H18.itp
-        sed -i '/#include "trappeua.ff\/forcefield.itp"/d' C8H18.itp
+        sed -i -n '/\[ moleculetype \]/,$p' ${name}.itp
+        # Remove pairs section (needed by TraPPE forcefield)
+        sed -i -n '1,/pairs/p;/angles/,$p' ${name}.itp
+        sed -i '\[ pairs \]/d' C8H18.itp
+        # Remove the footer
+        sed -i '/; Include Position restraint file/,$d' ${name}.itp
+        # Rename the molecule
+        sed -i "s/Other/${name}/g" ${name}.itp
 
 4. To create the coordinates for a box of octane molecules, we are going to use Packmol software. You will need ``gfortran``, which you can install by running ``sudo apt install gfortran``. To get and install Packmol:
 
