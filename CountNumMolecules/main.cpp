@@ -1,10 +1,20 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <iterator>
+#include <map>
 #include <string>
 #include <sstream>
-#include <map>
+#include <vector>
 
 std::map<char, float> masses;
+
+struct Molecule
+{
+    float mass;
+    float massConcentration;
+};
+
+std::map<std::string, Molecule> molecules;
 
 #define Lx 100.0f
 #define Ly 100.0f
@@ -100,19 +110,23 @@ int main(int argc, char *argv[])
     {
         while (getline(file, line))
         {
-            std::string compound;
-            std::stringstream ss(line);
-            getline(ss, compound, ' ');
-            float mass = getMass(compound);
-            std::cout << "Mass " << mass << std::endl;
-            std::string concentrationString;
-            do
+            std::istringstream iss(line);
+            std::vector<std::string> tokens(std::istream_iterator<std::string>{iss},
+                                 std::istream_iterator<std::string>());
+
+            //std::cout << "Mass: " << tokens[0] << "  Concentration: " << tokens[1] << std::endl;
+
+            if (tokens[0][0] != '#')
             {
-                getline(ss, concentrationString, ' ');
+                float mass = getMass(tokens[0]);
+                float massConcentration = atof(tokens[1].c_str());
+
+                molecules[tokens[0]].mass = mass;
+                molecules[tokens[0]].massConcentration = massConcentration;                
+
+                std::cout << "Mass " << mass << std::endl;
+                std::cout << "\% of mass: " << massConcentration << std::endl;
             }
-            while (!(concentrationString[0] >= 0 && concentrationString[0] <= 9));
-            float concentration = atoi(concentrationString.c_str());
-            std::cout << "\% of mass: " << concentration << std::endl;
         }
         file.close();
     }
