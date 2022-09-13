@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -14,6 +15,7 @@ struct Molecule
     float mass;
     float massConcentration;
     float concentration;
+    int count;
 };
 
 std::map<std::string, Molecule> molecules;
@@ -43,7 +45,7 @@ void readMassesDB(std::string filename)
     }
     else
     {
-        std::cout << "Unable to open file '" << filename << std::endl;
+        std::cout << "Unable to open file '" << filename << "'" << std::endl;
     }
     
     std::cout << "Masses database read:" << std::endl;
@@ -95,13 +97,13 @@ float getMass(std::string molecule)
 
 int main(int argc, char *argv[])
 {
-    if (argc < 2)
+    if (argc < 3)
     {
-        std::cout << "Please, specify the data file with the list of molecules." << std::endl;
+        std::cout << "Please, specify the data file with the list of molecules, followed by file with atomic weights." << std::endl;
         exit(0);
     }
 
-    readMassesDB("atomic_weights.dat");
+    readMassesDB(argv[2]);
 
     char* filename = argv[1];
     std::cout << "Reading: " << filename << "\n";
@@ -147,6 +149,9 @@ int main(int argc, char *argv[])
         for (auto& molecule : molecules)
         {
             molecule.second.concentration = molecule.second.massConcentration / molecule.second.mass;
+
+            molecule.second.count = std::max(static_cast<int>(std::rint(molecule.second.concentration*1000000)), 1);
+
             std::cout << molecule.first << ": " << molecule.second.concentration  << std::endl;
 
             totalConcentration += molecule.second.concentration;
@@ -170,12 +175,38 @@ int main(int argc, char *argv[])
     for (auto& molecule : molecules)
     {
         out << "structure " << molecule.first << ".pdb" << std::endl;
-        out << "  number " << std::rint(molecule.second.concentration*1000000) << std::endl;
+        out << "  number " << molecule.second.count << std::endl;
         out << "  inside box 0. 0. 0. 1000. 1000. 1000." << std::endl;
         out << "end structure" << std::endl;
     }
 
     out << std::endl;
+    out.close();
+
+    out.open("yamburg.top");
+
+    out << "; Include forcefield parameters" << std::endl;
+    out << "#include \"trappeua.ff/forcefield.itp\"" << std::endl;
+    out << "#include \"trappeua.ff/tip4p2005.itp\"" << std::endl;
+    for (auto& molecule : molecules)
+    {
+        out << "#include \"" << molecule.first << ".itp\"" << std::endl;
+    }
+    out << std::endl;
+
+    out << "[ system ]" << std::endl;
+    out << "; Name" << std::endl;
+    out << "Yamburg recomb" << std::endl;
+    out << std::endl;
+
+    out << "[ molecules ]" << std::endl;
+    out << "; Compound     #mols" << std::endl;
+    for (auto& molecule : molecules)
+    {
+        out << molecule.first << "      " << molecule.second.count << std::endl;
+    }
+    out << std::endl;    
+
     out.close();
     
     return 0;
