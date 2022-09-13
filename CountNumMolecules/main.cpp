@@ -1,3 +1,4 @@
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -12,6 +13,7 @@ struct Molecule
 {
     float mass;
     float massConcentration;
+    float concentration;
 };
 
 std::map<std::string, Molecule> molecules;
@@ -51,33 +53,33 @@ void readMassesDB(std::string filename)
     }
 }
 
-float getMass(std::string compound)
+float getMass(std::string molecule)
 {
-    std::cout << "Parsing " << compound << std::endl;
+    std::cout << "Parsing " << molecule << std::endl;
     float totalMass = 0.0f;
 
     int pos = 0;
     char element;
     int number = 1;
 
-    if (compound[0] != '#')
+    if (molecule[0] != '#')
     {
 
-        while (pos < compound.length() && compound[pos] != ' ' && compound[pos] != '_')
+        while (pos < molecule.length() && molecule[pos] != ' ' && molecule[pos] != '_')
         {
-            char element = compound[pos];
+            char element = molecule[pos];
 
             std::cout << "Element: " << element << std::endl;
             
             pos++;
-            if (compound[pos] >= '0' && compound[pos] <= '9')
+            if (molecule[pos] >= '0' && molecule[pos] <= '9')
             {
                 int posend = pos + 1;
-                while (posend < compound.length() && (compound[posend] >= '0' && compound[posend] <= '9'))
+                while (posend < molecule.length() && (molecule[posend] >= '0' && molecule[posend] <= '9'))
                 {
                     posend ++;
                 }
-                number = atoi(compound.substr(pos, posend).c_str());
+                number = atoi(molecule.substr(pos, posend).c_str());
                 pos = posend;
             }
             else
@@ -95,7 +97,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
-        std::cout << "Please, specify the data file with the list of compounds." << std::endl;
+        std::cout << "Please, specify the data file with the list of molecules." << std::endl;
         exit(0);
     }
 
@@ -119,7 +121,7 @@ int main(int argc, char *argv[])
             if (tokens[0][0] != '#')
             {
                 float mass = getMass(tokens[0]);
-                float massConcentration = atof(tokens[1].c_str());
+                float massConcentration = atof(tokens[1].c_str())*0.01;
 
                 molecules[tokens[0]].mass = mass;
                 molecules[tokens[0]].massConcentration = massConcentration;                
@@ -129,11 +131,52 @@ int main(int argc, char *argv[])
             }
         }
         file.close();
+
+        double totalMassConcentration = 0.0;
+        double totalMass = 0.0;
+        for (auto const& molecule : molecules)
+        {
+            std::cout << molecule.first << ": " << molecule.second.mass << ", " << molecule.second.massConcentration << std::endl;
+            totalMassConcentration += molecule.second.massConcentration;
+            totalMass += molecule.second.mass * molecule.second.massConcentration;
+        }
+        std::cout << "Total mass concentration: " << totalMassConcentration << std::endl;
+        std::cout << "Total mass per 100%: " << totalMass << std::endl;
+
+        double totalConcentration = 0.0;
+        for (auto& molecule : molecules)
+        {
+            molecule.second.concentration = molecule.second.massConcentration / molecule.second.mass;
+            std::cout << molecule.first << ": " << molecule.second.concentration  << std::endl;
+
+            totalConcentration += molecule.second.concentration;
+        }
+        std::cout << "Total concentration: " << totalConcentration << std::endl;
+
     }
     else
     {
         std::cout << "Unable to open file" << std::endl;
     }
+
+    std::ofstream out;
+    out.open("yamburg_packmol.inp");
+
+    out << "tolerance 2.0" << std::endl;
+    out << "filetype pdb" << std::endl;
+    out << "output yamburg_1000nm3.pdb" << std::endl;
+    out << std::endl;
+
+    for (auto& molecule : molecules)
+    {
+        out << "structure " << molecule.first << ".pdb" << std::endl;
+        out << "  number " << std::rint(molecule.second.concentration*1000000) << std::endl;
+        out << "  inside box 0. 0. 0. 1000. 1000. 1000." << std::endl;
+        out << "end structure" << std::endl;
+    }
+
+    out << std::endl;
+    out.close();
     
     return 0;
 }
