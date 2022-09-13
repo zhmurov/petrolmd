@@ -6,6 +6,10 @@
 
 std::map<char, float> masses;
 
+#define Lx 100.0f
+#define Ly 100.0f
+#define Lz 100.0f
+
 void readMassesDB(std::string filename)
 {
     std::string line;
@@ -39,15 +43,42 @@ void readMassesDB(std::string filename)
 
 float getMass(std::string compound)
 {
+    std::cout << "Parsing " << compound << std::endl;
     float totalMass = 0.0f;
-    char element = compound[0];
+
+    int pos = 0;
+    char element;
     int number = 1;
-    if (compound.find_first_of("1234567890") == 1)
+
+    if (compound[0] != '#')
     {
-        number = atoi(compound.substr(1, compound.find_first_of("CHI \t\r\n") + 1).c_str());
+
+        while (pos < compound.length() && compound[pos] != ' ' && compound[pos] != '_')
+        {
+            char element = compound[pos];
+
+            std::cout << "Element: " << element << std::endl;
+            
+            pos++;
+            if (compound[pos] >= '0' && compound[pos] <= '9')
+            {
+                int posend = pos + 1;
+                while (posend < compound.length() && (compound[posend] >= '0' && compound[posend] <= '9'))
+                {
+                    posend ++;
+                }
+                number = atoi(compound.substr(pos, posend).c_str());
+                pos = posend;
+            }
+            else
+            {
+                number = 1;
+            }
+            totalMass += masses[element]*number;
+        }
     }
-    totalMass += masses[element]*number;
-    return 0.0f;
+
+    return totalMass;
 }
 
 int main(int argc, char *argv[])
@@ -69,13 +100,19 @@ int main(int argc, char *argv[])
     {
         while (getline(file, line))
         {
-            char element = line.c_str()[0];
-            if (element != '#')
+            std::string compound;
+            std::stringstream ss(line);
+            getline(ss, compound, ' ');
+            float mass = getMass(compound);
+            std::cout << "Mass " << mass << std::endl;
+            std::string concentrationString;
+            do
             {
-            //std::string::size_type pos = line.find_first_of("1234567890");
-            //std::string element = line.substr(0, pos);
-                std::cout << "Element:" << element << std::endl;
+                getline(ss, concentrationString, ' ');
             }
+            while (!(concentrationString[0] >= 0 && concentrationString[0] <= 9));
+            float concentration = atoi(concentrationString.c_str());
+            std::cout << "\% of mass: " << concentration << std::endl;
         }
         file.close();
     }
