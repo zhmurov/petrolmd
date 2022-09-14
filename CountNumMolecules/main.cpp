@@ -20,9 +20,9 @@ struct Molecule
 
 std::map<std::string, Molecule> molecules;
 
-#define Lx 100.0f
-#define Ly 100.0f
-#define Lz 100.0f
+float Lx = 10.0f;
+float Ly = 10.0f;
+float Lz = 10.0f;
 
 void readMassesDB(std::string filename)
 {
@@ -97,11 +97,15 @@ float getMass(std::string molecule)
 
 int main(int argc, char *argv[])
 {
-    if (argc < 4)
+    if (argc < 7)
     {
-        std::cout << "Usage: ./count_mols <atomic_weights_db.dat> <oil_composition.dat> <output_filename>" << std::endl;
+        std::cout << "Usage: ./count_mols <atomic_weights_db.dat> <oil_composition.dat> <output_filename> <Lx(nm)> <Ly(nm)> <Lz(nm)>" << std::endl;
         exit(0);
     }
+
+    Lx = atof(argv[4]);
+    Ly = atof(argv[5]);
+    Lz = atof(argv[6]);
 
     readMassesDB(argv[1]);
 
@@ -150,7 +154,7 @@ int main(int argc, char *argv[])
         {
             molecule.second.concentration = molecule.second.massConcentration / molecule.second.mass;
 
-            molecule.second.count = std::max(static_cast<int>(std::rint(molecule.second.concentration*1000000)), 1);
+            molecule.second.count = std::max(static_cast<int>(std::rint(molecule.second.concentration*100000)), 1);
 
             std::cout << molecule.first << ": " << molecule.second.concentration  << std::endl;
 
@@ -170,14 +174,14 @@ int main(int argc, char *argv[])
 
     out << "tolerance 2.0" << std::endl;
     out << "filetype pdb" << std::endl;
-    out << "output yamburg_1000nm3.pdb" << std::endl;
+    out << "output " << outputName << ".pdb" << std::endl;
     out << std::endl;
 
     for (auto& molecule : molecules)
     {
-        out << "structure " << molecule.first << ".pdb" << std::endl;
+        out << "structure toppar/" << molecule.first << ".pdb" << std::endl;
         out << "  number " << molecule.second.count << std::endl;
-        out << "  inside box 0. 0. 0. 1000. 1000. 1000." << std::endl;
+        out << "  inside box 0. 0. 0. " << Lx*10.0f << " " << Ly*10.0f << " " << Lz*10.0f << std::endl;
         out << "end structure" << std::endl;
     }
 
@@ -191,13 +195,13 @@ int main(int argc, char *argv[])
     out << "#include \"trappeua.ff/tip4p2005.itp\"" << std::endl;
     for (auto& molecule : molecules)
     {
-        out << "#include \"" << molecule.first << ".itp\"" << std::endl;
+        out << "#include \"toppar/" << molecule.first << ".itp\"" << std::endl;
     }
     out << std::endl;
 
     out << "[ system ]" << std::endl;
     out << "; Name" << std::endl;
-    out << "Yamburg recomb" << std::endl;
+    out << outputName << std::endl;
     out << std::endl;
 
     out << "[ molecules ]" << std::endl;
