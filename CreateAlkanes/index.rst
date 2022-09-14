@@ -256,7 +256,7 @@ You should be good to go for GROMACS simulation. You can use provided ``.mdp`` f
 
 .. code-block:: shell
 
-    cp ${PETROLMD}/CreateAlkanes/files/*.mdp .
+    cp ${PETROLMD}/files/*.mdp .
 
 .. code-block:: shell
 
