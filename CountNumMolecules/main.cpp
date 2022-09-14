@@ -97,15 +97,15 @@ float getMass(std::string molecule)
 
 int main(int argc, char *argv[])
 {
-    if (argc < 3)
+    if (argc < 4)
     {
-        std::cout << "Please, specify the data file with the list of molecules, followed by file with atomic weights." << std::endl;
+        std::cout << "Usage: ./count_mols <atomic_weights_db.dat> <oil_composition.dat> <output_filename>" << std::endl;
         exit(0);
     }
 
-    readMassesDB(argv[2]);
+    readMassesDB(argv[1]);
 
-    char* filename = argv[1];
+    char* filename = argv[2];
     std::cout << "Reading: " << filename << "\n";
     
     std::string line;
@@ -164,8 +164,9 @@ int main(int argc, char *argv[])
         std::cout << "Unable to open file" << std::endl;
     }
 
+    std::string outputName(argv[3]);
     std::ofstream out;
-    out.open("yamburg_packmol.inp");
+    out.open(outputName + "_packmol.inp");
 
     out << "tolerance 2.0" << std::endl;
     out << "filetype pdb" << std::endl;
@@ -183,7 +184,7 @@ int main(int argc, char *argv[])
     out << std::endl;
     out.close();
 
-    out.open("yamburg.top");
+    out.open(outputName + ".top");
 
     out << "; Include forcefield parameters" << std::endl;
     out << "#include \"trappeua.ff/forcefield.itp\"" << std::endl;
