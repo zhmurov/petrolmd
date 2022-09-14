@@ -1,39 +1,3 @@
-Creating alkanes
-================
-
-Create PDB files
-----------------
-
-.. code-block:: shell
-
-    mkdir files
-    cd files
-    ../build/CreateAlkanes/create_alkanes
-
-Copy additional files, e.g. iso-butane and iso-pentane pdbs (see ``files/PDBs`` folder in this repo):
-
-.. code-block:: shell
-
-    cp ../CreateAlkanes/files/PDBs/C4H10_ISO.pdb .
-    cp ../CreateAlkanes/files/PDBs/C5H12_ISO.pdb .
-
-Make topologies
----------------
-
-.. code-block:: shell
-
-    bash ../CreateAlkanes/create_topologies.sh
-
-This will create ``.itp`` files for all the coordinates that we have in the folder.
-
-.. code-block:: shell
-
-    ../build/CountNumMolecules/count_mols ../CountNumMolecules/files/yamburg_recomb.dat ../CountNumMolecules/files/atomic_weights.dat
-
-.. code-block:: shell
-
-    $PACKMOL < yamburg_packmol.inp
-
 Build and install GROMACS
 =========================
 
@@ -55,17 +19,22 @@ Build and install GROMACS
         make -j4
         sudo make install
 
+Optionally, one can set the installation path by adding ``-DCMAKE_INSTALL_PREFIX=/your/desired/path`` to the ``cmake`` command.
+
 3. You can optionally check the build before installing by running the tests:
 
     .. code-block:: shell
         
         make check -j4
 
-GROMACS simulations of a box of 1000 octane molecules
-=====================================================
+4. It is convenient to set a variable for GROMACS executable. If you install into the default location:
 
-Building the system
--------------------
+    .. code-block:: shell
+
+        GMX=/usr/local/gromacs/bin/gmx
+
+Force-field and additional software:
+====================================
 
 1. Get the forcefield and make it available to GROMACS. Assuming that GROMACS in installed at ``/usr/local/gromacs``:
 
@@ -74,9 +43,26 @@ Building the system
         git clone https://github.com/wesbarnett/trappeua.git
         sudo cp -pr trappeua/trappeua.ff /usr/local/gromacs/share/gromacs/top/
 
-2. Get the PDB file for octane molecule, e.g. from the output of ``reate_alkanes`` script above. You can also find coordinates online, for instance `here <https://www.angelo.edu/faculty/kboudrea/molecule_gallery/01_alkanes/00_alkanes.htm>`_.
+2. To create the coordinates for a box of molecules, we can use Packmol software. You will need ``gfortran``, which you can install by running ``sudo apt install gfortran``. To get and install Packmol:
 
-3. Create topology file for a single molecule:
+    .. code-block:: shell
+
+        git clone https://github.com/m3g/packmol.git
+        cd packmol
+        git checkout v20.3.5
+        ./configure
+        make
+        PACKMOL=$(pwd)/packmol
+
+GROMACS simulations of a box of 1000 octane molecules
+=====================================================
+
+Building the system
+-------------------
+
+1. Get the PDB file for octane molecule, e.g. from the output of ``reate_alkanes`` script above. You can also find coordinates online, for instance `here <https://www.angelo.edu/faculty/kboudrea/molecule_gallery/01_alkanes/00_alkanes.htm>`_.
+
+2. Create topology file for a single molecule:
     
     .. code-block:: shell
         
@@ -99,18 +85,7 @@ Building the system
         # Rename the molecule
         sed -i "s/Other/${name}/g" ${name}.itp
 
-4. To create the coordinates for a box of octane molecules, we are going to use Packmol software. You will need ``gfortran``, which you can install by running ``sudo apt install gfortran``. To get and install Packmol:
-
-    .. code-block:: shell
-
-        git clone https://github.com/m3g/packmol.git
-        cd packmol
-        git checkout v20.3.5
-        ./configure
-        make
-        PACKMOL=$(pwd)/packmol
-
-5. To create a 10nm x 10nm x 10nm box containing 1000 octane molecules with Packmol, create `C8H18_1000.inp` file with the following:
+3. To create a 10nm x 10nm x 10nm box containing 1000 octane molecules with Packmol, create `C8H18_1000.inp` file with the following:
 
     .. code-block:: text
 
@@ -131,7 +106,7 @@ Building the system
 
     This should create a ``C8H18_1000.pdb`` file. Feel free to load it into VMD or other visualization software to have a look.
 
-6. Create topology file for GROMACS. First, run ``pdb2gmx`` to create ``.gro`` file and a stub for topology file. We are going to use the topology for a single octane molecule, but having a ``.top`` file to start with should help:
+4. Create topology file for GROMACS. First, run ``pdb2gmx`` to create ``.gro`` file and a stub for topology file. We are going to use the topology for a single octane molecule, but having a ``.top`` file to start with should help:
 
     .. code-block:: shell
         
@@ -213,6 +188,45 @@ System preparation
 
         $GMX grompp -f md.mdp -c npt.gro -p C8H18_1000.top -o md.tpr
         $GMX mdrun -deffnm md
+
+
+Creating alkanes
+================
+
+Create PDB files
+----------------
+
+.. code-block:: shell
+
+    mkdir files
+    cd files
+    ../build/CreateAlkanes/create_alkanes
+
+Copy additional files, e.g. iso-butane and iso-pentane pdbs (see ``files/PDBs`` folder in this repo):
+
+.. code-block:: shell
+
+    cp ../CreateAlkanes/files/PDBs/C4H10_ISO.pdb .
+    cp ../CreateAlkanes/files/PDBs/C5H12_ISO.pdb .
+
+Make topologies
+---------------
+
+.. code-block:: shell
+
+    bash ../CreateAlkanes/create_topologies.sh
+
+This will create ``.itp`` files for all the coordinates that we have in the folder.
+
+.. code-block:: shell
+
+    ../build/CountNumMolecules/count_mols ../CountNumMolecules/files/atomic_weights.dat ../CountNumMolecules/files/<composition_data>.dat <system_name>
+
+This will produce two files: topology for GROMACS and input file for packmol. To create coordinates file, use:
+
+.. code-block:: shell
+
+    $PACKMOL < <system_name>_packmol.inp
 
 
 Creating topologies for isobutane and isopentane molecules
