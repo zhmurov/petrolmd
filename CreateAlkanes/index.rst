@@ -192,34 +192,59 @@ System preparation
 Creating alkanes
 ================
 
+Building the helper codes
+-------------------------
+
+.. code-block:: shell
+
+    git clone git@gitlab.com:artemzhmurov/petrolmd.git
+    cd petrolmd
+    cmake -S. -Bbuild
+    cmake --build build
+    PETROLMD=${pwd}
+
 Create PDB files
 ----------------
 
 .. code-block:: shell
 
-    mkdir files
-    cd files
-    ../build/CreateAlkanes/create_alkanes
+    mkdir toppar
+    cd toppar
+    ${PETROLMD}/build/CreateAlkanes/create_alkanes
 
 Copy additional files, e.g. iso-butane and iso-pentane pdbs (see ``files/PDBs`` folder in this repo):
 
 .. code-block:: shell
 
-    cp ../CreateAlkanes/files/PDBs/C4H10_ISO.pdb .
-    cp ../CreateAlkanes/files/PDBs/C5H12_ISO.pdb .
+    cp ${PETROLMD}/CreateAlkanes/files/PDBs/C4H10_ISO.pdb .
+    cp ${PETROLMD}/CreateAlkanes/files/PDBs/C5H12_ISO.pdb .
 
 Make topologies
 ---------------
 
 .. code-block:: shell
 
-    bash ../CreateAlkanes/create_topologies.sh
+    bash ${PETROLMD}/CreateAlkanes/create_topologies.sh
 
-This will create ``.itp`` files for all the coordinates that we have in the folder.
+This will create ``.itp`` files for all the coordinates that we have in the folder. You will also need coordinates for the water molecule:
 
 .. code-block:: shell
 
-    ../build/CountNumMolecules/count_mols ../CountNumMolecules/files/atomic_weights.dat ../CountNumMolecules/files/<composition_data>.dat <system_name> <Lx(nm)> <Ly(nm)> <Lz(nm)>
+    cp ${PETROLMD}/files/tip4p.gro .
+    cd ..
+
+It is convenient to save the system name and box sizes into variables, so scripts below can be copy-pasted:
+
+.. code-block:: shell
+
+    Lx=<Lx(nm)>
+    Ly=<Ly(nm)>
+    Lz=<Lz(nm)>
+    SYSTEM_NAME=<system_name>
+
+.. code-block:: shell
+
+    ${PETROLMD}/build/CountNumMolecules/count_mols ${PETROLMD}/CountNumMolecules/files/atomic_weights.dat ${PETROLMD}/CountNumMolecules/files/<composition_data>.dat ${SYSTEM_NAME} ${Lx} ${Ly} ${Lz}
 
 This will produce two files: topology for GROMACS and input file for packmol. To create coordinates file, use:
 
@@ -231,22 +256,26 @@ You should be good to go for GROMACS simulation. You can use provided ``.mdp`` f
 
 .. code-block:: shell
 
-    $GMX editconf -f <system_name>.pdb -o <system_name>_box.gro -box <Lx(nm)> <Ly(nm)> <Lz(nm)>
-    $GMX solvate -cp <system_name>_box.gro -cs toppar/tip4p.gro -o <system_name>_solv.gro -p <system_name>.top
-    $GMX grompp -f em.mdp -c <system_name>_solv.gro -p <system_name>.top -o em.tpr
+    cp ${PETROLMD}/CreateAlkanes/files/*.mdp .
+
+.. code-block:: shell
+
+    $GMX editconf -f ${SYSTEM_NAME}.pdb -o ${SYSTEM_NAME}_box.gro -box ${Lx} ${Ly} ${Lz}
+    $GMX solvate -cp ${SYSTEM_NAME}_box.gro -cs toppar/tip4p.gro -o ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top
+    $GMX grompp -f em.mdp -c ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top -o em.tpr
     $GMX mdrun -deffnm em
-    $GMX grompp -f nvt.mdp -c em.gro -p <system_name>.top -o nvt.tpr
+    $GMX grompp -f nvt.mdp -c em.gro -p ${SYSTEM_NAME}.top -o nvt.tpr
     $GMX mdrun -deffnm nvt
-    $GMX grompp -f npt.mdp -c nvt.gro -p <system_name>.top -o npt.tpr
+    $GMX grompp -f npt.mdp -c nvt.gro -p ${SYSTEM_NAME}.top -o npt.tpr
     $GMX mdrun -deffnm npt
-    $GMX grompp -f md.mdp -c npt.gro -p <system_name>.top -o md.tpr
+    $GMX grompp -f md.mdp -c npt.gro -p ${SYSTEM_NAME}.top -o md.tpr
     $GMX mdrun -deffnm md
 
 Example script:
 
 .. code-block:: shell
 
-    ~/git/artemzhmurov/petrolmd/build/CountNumMolecules/count_mols ~/git/artemzhmurov/petrolmd/CountNumMolecules/files/atomic_weights.dat ~/git/artemzhmurov/petrolmd/CountNumMolecules/files/methane-octane.dat methane-octane 10.0 10.0 10.0
+    ${PETROLMD}/build/CountNumMolecules/count_mols ${PETROLMD}/CountNumMolecules/files/atomic_weights.dat ${PETROLMD}/CountNumMolecules/files/methane-octane.dat methane-octane 10.0 10.0 10.0
     $PACKMOL < methane-octane_packmol.inp
     $GMX editconf -f methane-octane.pdb -o methane-octane_box.gro -box 10 10 10
     $GMX solvate -cp methane-octane_box.gro -cs toppar/tip4p.gro -o methane-octane_solv.gro -p methane-octane.top
