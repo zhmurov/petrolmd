@@ -66,7 +66,6 @@ Building the system
     
     .. code-block:: shell
         
-        GMX=/usr/local/gromacs/bin/gmx
         $GMX pdb2gmx -f C8H18.pdb -o C8H18.gro -p C8H18.top -i C8H18_posre.itp
 
     Select TraPPE-UA forcefield for hydrocarbons ("Transferable Potentials for Phase Equilibria - United Atom (TraPPE-UA) with HH-Alkane modifications") and TIP4P ("TIP4P2005  TIP4P/2005") for water.
@@ -220,13 +219,46 @@ This will create ``.itp`` files for all the coordinates that we have in the fold
 
 .. code-block:: shell
 
-    ../build/CountNumMolecules/count_mols ../CountNumMolecules/files/atomic_weights.dat ../CountNumMolecules/files/<composition_data>.dat <system_name>
+    ../build/CountNumMolecules/count_mols ../CountNumMolecules/files/atomic_weights.dat ../CountNumMolecules/files/<composition_data>.dat <system_name> <Lx(nm)> <Ly(nm)> <Lz(nm)>
 
 This will produce two files: topology for GROMACS and input file for packmol. To create coordinates file, use:
 
 .. code-block:: shell
 
     $PACKMOL < <system_name>_packmol.inp
+
+You should be good to go for GROMACS simulation. You can use provided ``.mdp`` files for energy minimization. equilibration and production runs:
+
+.. code-block:: shell
+
+    $GMX editconf -f <system_name>.pdb -o <system_name>_box.gro -box <Lx(nm)> <Ly(nm)> <Lz(nm)>
+    $GMX solvate -cp <system_name>_box.gro -cs toppar/tip4p.gro -o <system_name>_solv.gro -p <system_name>.top
+    $GMX grompp -f em.mdp -c <system_name>_solv.gro -p <system_name>.top -o em.tpr
+    $GMX mdrun -deffnm em
+    $GMX grompp -f nvt.mdp -c em.gro -p <system_name>.top -o nvt.tpr
+    $GMX mdrun -deffnm nvt
+    $GMX grompp -f npt.mdp -c nvt.gro -p <system_name>.top -o npt.tpr
+    $GMX mdrun -deffnm npt
+    $GMX grompp -f md.mdp -c npt.gro -p <system_name>.top -o md.tpr
+    $GMX mdrun -deffnm md
+
+Example script:
+
+.. code-block:: shell
+
+    ~/git/artemzhmurov/petrolmd/build/CountNumMolecules/count_mols ~/git/artemzhmurov/petrolmd/CountNumMolecules/files/atomic_weights.dat ~/git/artemzhmurov/petrolmd/CountNumMolecules/files/methane-octane.dat methane-octane 10.0 10.0 10.0
+    $PACKMOL < methane-octane_packmol.inp
+    $GMX editconf -f methane-octane.pdb -o methane-octane_box.gro -box 10 10 10
+    $GMX solvate -cp methane-octane_box.gro -cs toppar/tip4p.gro -o methane-octane_solv.gro -p methane-octane.top
+    $GMX grompp -f em.mdp -c methane-octane_solv.gro -p methane-octane.top -o em.tpr
+    $GMX mdrun -deffnm em
+    $GMX grompp -f nvt.mdp -c em.gro -p methane-octane.top -o nvt.tpr
+    $GMX mdrun -deffnm nvt
+    $GMX grompp -f npt.mdp -c nvt.gro -p methane-octane.top -o npt.tpr
+    $GMX mdrun -deffnm npt
+    $GMX grompp -f md.mdp -c npt.gro -p methane-octane.top -o md.tpr
+    $GMX mdrun -deffnm md
+
 
 
 Creating topologies for isobutane and isopentane molecules
