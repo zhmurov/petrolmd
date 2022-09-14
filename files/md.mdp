@@ -25,7 +25,7 @@ nstxout-compressed       = 5000    ; for writing coords (x)
 pcoupl                  = Parrinello-Rahman                         ; Pressure coupling on in NPT
 pcoupltype              = anisotropic                               ; non-uniform scaling of box vectors
 ref_p                   = 1.0    1.0    1.0    0.0    0.0    0.0    ; reference pressure, in bar. No shear, off-diagonal elements are zero
-tau_p                   = 5.0    5.0    5.0    5.0    5.0    5.0    ; time constant, in ps
+tau_p                   = 5.0                                       ; time constant, in ps
 compressibility         = 4.5e-5 4.5e-5 4.5e-5 4.5e-5 4.5e-5 4.5e-5 ; isothermal compressibility of water, bar^-1
 refcoord_scaling        = com
 
