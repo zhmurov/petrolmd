@@ -12,13 +12,14 @@ std::map<char, float> masses;
 
 struct Molecule
 {
+    std::string name;
     float mass;
     float massConcentration;
     float concentration;
     int count;
 };
 
-std::map<std::string, Molecule> molecules;
+std::vector<Molecule> molecules;
 
 float Lx = 10.0f;
 float Ly = 10.0f;
@@ -129,8 +130,12 @@ int main(int argc, char *argv[])
                 float mass = getMass(tokens[0]);
                 float massConcentration = atof(tokens[1].c_str())*0.01;
 
-                molecules[tokens[0]].mass = mass;
-                molecules[tokens[0]].massConcentration = massConcentration;                
+                Molecule molecule;
+                molecule.name = tokens[0];
+                molecule.mass = mass;
+                molecule.massConcentration = massConcentration;
+
+                molecules.push_back(molecule);             
 
                 std::cout << "Mass " << mass << std::endl;
                 std::cout << "\% of mass: " << massConcentration << std::endl;
@@ -142,9 +147,9 @@ int main(int argc, char *argv[])
         double totalMass = 0.0;
         for (auto const& molecule : molecules)
         {
-            std::cout << molecule.first << ": " << molecule.second.mass << ", " << molecule.second.massConcentration << std::endl;
-            totalMassConcentration += molecule.second.massConcentration;
-            totalMass += molecule.second.mass * molecule.second.massConcentration;
+            std::cout << molecule.name << ": " << molecule.mass << ", " << molecule.massConcentration << std::endl;
+            totalMassConcentration += molecule.massConcentration;
+            totalMass += molecule.mass * molecule.massConcentration;
         }
         std::cout << "Total mass concentration: " << totalMassConcentration << std::endl;
         std::cout << "Total mass per 100%: " << totalMass << std::endl;
@@ -152,13 +157,13 @@ int main(int argc, char *argv[])
         double totalConcentration = 0.0;
         for (auto& molecule : molecules)
         {
-            molecule.second.concentration = molecule.second.massConcentration / molecule.second.mass;
+            molecule.concentration = molecule.massConcentration / molecule.mass;
 
-            molecule.second.count = std::max(static_cast<int>(std::rint(molecule.second.concentration*100000)), 1);
+            molecule.count = std::max(static_cast<int>(std::rint(molecule.concentration*100000)), 1);
 
-            std::cout << molecule.first << ": " << molecule.second.concentration  << std::endl;
+            std::cout << molecule.name << ": " << molecule.concentration  << std::endl;
 
-            totalConcentration += molecule.second.concentration;
+            totalConcentration += molecule.concentration;
         }
         std::cout << "Total concentration: " << totalConcentration << std::endl;
 
@@ -179,8 +184,8 @@ int main(int argc, char *argv[])
 
     for (auto& molecule : molecules)
     {
-        out << "structure toppar/" << molecule.first << ".pdb" << std::endl;
-        out << "  number " << molecule.second.count << std::endl;
+        out << "structure toppar/" << molecule.name << ".pdb" << std::endl;
+        out << "  number " << molecule.count << std::endl;
         out << "  inside box 0. 0. 0. " << Lx*10.0f << " " << Ly*10.0f << " " << Lz*10.0f << std::endl;
         out << "end structure" << std::endl;
     }
@@ -195,7 +200,7 @@ int main(int argc, char *argv[])
     out << "#include \"trappeua.ff/tip4p2005.itp\"" << std::endl;
     for (auto& molecule : molecules)
     {
-        out << "#include \"toppar/" << molecule.first << ".itp\"" << std::endl;
+        out << "#include \"toppar/" << molecule.name << ".itp\"" << std::endl;
     }
     out << std::endl;
 
@@ -208,7 +213,7 @@ int main(int argc, char *argv[])
     out << "; Compound     #mols" << std::endl;
     for (auto& molecule : molecules)
     {
-        out << molecule.first << "      " << molecule.second.count << std::endl;
+        out << molecule.name << "      " << molecule.count << std::endl;
     }
     out << std::endl;    
 
