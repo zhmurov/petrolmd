@@ -250,7 +250,7 @@ This will produce two files: topology for GROMACS and input file for packmol. To
 
 .. code-block:: shell
 
-    $PACKMOL < <system_name>_packmol.inp
+    $PACKMOL < ${SYSTEM_NAME}_packmol.inp
 
 You should be good to go for GROMACS simulation. You can use provided ``.mdp`` files for energy minimization. equilibration and production runs:
 
