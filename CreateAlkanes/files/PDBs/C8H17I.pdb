@@ -1,0 +1,11 @@
+COMPND  C8H17I                                                      
+HETATM    1  C   CH3     1      -5.110   0.443  -0.085
+HETATM    2  C   CH2     2      -3.866  -0.428  -0.028
+HETATM    3  C   CH2     2      -2.592   0.414   0.044
+HETATM    4  C   CH2     3      -1.344  -0.470   0.062
+HETATM    5  C   CH2     4      -0.035   0.323   0.063
+HETATM    6  C   CH2     5       1.213  -0.561   0.006
+HETATM    7  C   CH2     6       2.491   0.282   0.039
+HETATM    8  C   CH2     7       3.735  -0.599  -0.058
+HETATM    9  C   I       8       5.509   0.595  -0.043
+END  
