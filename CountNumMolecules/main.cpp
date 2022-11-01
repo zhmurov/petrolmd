@@ -25,6 +25,8 @@ float Lx = 10.0f;
 float Ly = 10.0f;
 float Lz = 10.0f;
 
+float density = 1000.0f; // g/l
+
 void readMassesDB(std::string filename)
 {
     std::string line;
@@ -154,12 +156,16 @@ int main(int argc, char *argv[])
         std::cout << "Total mass concentration: " << totalMassConcentration << std::endl;
         std::cout << "Total mass per 100%: " << totalMass << std::endl;
 
+        double alpha = (density*0.6022*Lx*Ly*Lz) / totalMassConcentration;
+
+        std::cout << "Density scaling factor: " << alpha << std::endl;
+
         double totalConcentration = 0.0;
         for (auto& molecule : molecules)
         {
-            molecule.concentration = molecule.massConcentration / molecule.mass;
+            molecule.concentration = alpha * molecule.massConcentration / molecule.mass;
 
-            molecule.count = std::max(static_cast<int>(std::rint(molecule.concentration*100000)), 1);
+            molecule.count = std::max(static_cast<int>(std::rint(molecule.concentration)), 1);
 
             std::cout << molecule.name << ": " << molecule.concentration  << std::endl;
 
