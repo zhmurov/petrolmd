@@ -1,0 +1,34 @@
+ 1737  cd ../8-Yam2/
+ 1738  ls
+ 1739  history
+ 1740  mkdir toppar
+ 1741  cd toppar
+ 1742  ${PETROLMD}/build/CreateAlkanes/create_alkanes
+ 1743  cp ${PETROLMD}/CreateAlkanes/files/PDBs/C4H10_ISO.pdb .
+ 1744  cp ${PETROLMD}/CreateAlkanes/files/PDBs/C5H12_ISO.pdb .
+ 1745  bash ${PETROLMD}/CreateAlkanes/create_topologies.sh
+ 1746  history > history.txt
+ 1747  cp ${PETROLMD}/files/tip4p.gro
+ 1748  cp ${PETROLMD}/files/tip4p.gro .
+ 1749  cp ${PETROLMD}/files/SOL.itp .
+ 1750  cd ..
+ 1751  Lx=20
+ 1752  Ly=20
+ 1753  Lz=20
+ 1754  SYSTEM_NAME=yamburg_recomb
+ 1755  $GMX solvate -cs toppar/tip4p.gro -box 10.0 20.0 10.0 -maxsol 60000
+ 1756  ${PETROLMD}/build/CountNumMolecules/count_mols ${PETROLMD}/CountNumMolecules/files/atomic_weights.dat ${PETROLMD}/CountNumMolecules/files/${SYSTEM_NAME}.dat ${SYSTEM_NAME} 10 20 10
+ 1757  $PACKMOL < ${SYSTEM_NAME}_packmol.inp
+ 1758  cp ${PETROLMD}/files/*.mdp .
+ 1759  $GMX editconf -f ${SYSTEM_NAME}.pdb -o ${SYSTEM_NAME}_box.gro -box ${Lx} ${Ly} ${Lz} -noc
+ 1760  $GMX solvate -cp ${SYSTEM_NAME}_box.gro -cs toppar/tip4p.gro -o ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top  -maxsol 60000
+ 1761  $GMX grompp -f em.mdp -c ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top -o em.tpr
+ 1762  $GMX mdrun -deffnm em
+ 1763  top2psf yamburg_recomb.top toppar/ yamburg_recomb.psf
+ 1764  $GMX grompp -f em.mdp -c ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top -o em.tpr
+ 1765  top2psf yamburg_recomb.top toppar/ yamburg_recomb.psf
+ 1766  $GMX mdrun -deffnm em
+ 1767  $GMX grompp -f nvt.mdp -c em.gro -p ${SYSTEM_NAME}.top -o nvt.tpr
+ 1768  $GMX mdrun -deffnm nvt
+ 1769  $GMX grompp -f npt.mdp -c nvt.gro -p ${SYSTEM_NAME}.top -o npt.tpr
+ 1770  $GMX mdrun -deffnm npt
