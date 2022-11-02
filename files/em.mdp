@@ -14,4 +14,4 @@ rvdw                    = 1.4       ; short-range van der Waals cutoff (in nm)
 coulombtype             = PME       ; Particle Mesh Ewald for long-range electrostatics
 fourierspacing          = 0.1     ; grid spacing for FFT
 
-
+lincs-warnangle = 60
