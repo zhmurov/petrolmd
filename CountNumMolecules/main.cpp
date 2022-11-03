@@ -17,18 +17,13 @@ struct Molecule
     float massConcentration;
     float concentration;
     int count;
-    int compartment;
 };
 
 std::vector<Molecule> molecules;
 
-float Lx1 = 10.0f;
-float Ly1 = 10.0f;
-float Lz1 = 10.0f;
-
-float Lx2 = 10.0f;
-float Ly2 = 10.0f;
-float Lz2 = 10.0f;
+float Lx = 10.0f;
+float Ly = 10.0f;
+float Lz = 10.0f;
 
 float density = 1000.0f; // g/l
 
@@ -111,22 +106,9 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    Lx1 = atof(argv[4]);
-    Ly1 = atof(argv[5]);
-    Lz1 = atof(argv[6]);
-
-    if (argc == 10)
-    {
-        Lx2 = atof(argv[7]);
-        Ly2 = atof(argv[8]);
-        Lz2 = atof(argv[9]);
-    }
-    else
-    {
-        Lx2 = Lx1;
-        Ly2 = Ly1;
-        Lz2 = Lz1;
-    }
+    Lx = atof(argv[4]);
+    Ly = atof(argv[5]);
+    Lz = atof(argv[6]);
 
     readMassesDB(argv[1]);
 
@@ -150,13 +132,10 @@ int main(int argc, char *argv[])
                 float mass = getMass(tokens[0]);
                 float massConcentration = atof(tokens[1].c_str())*0.01;
 
-                float compartment = (tokens.size() > 2) ? atoi(tokens[2].c_str()) : 1;
-
                 Molecule molecule;
                 molecule.name = tokens[0];
                 molecule.mass = mass;
                 molecule.massConcentration = massConcentration;
-                molecule.compartment = compartment;
 
                 molecules.push_back(molecule);             
 
@@ -177,7 +156,7 @@ int main(int argc, char *argv[])
         std::cout << "Total mass concentration: " << totalMassConcentration << std::endl;
         std::cout << "Total mass per 100%: " << totalMass << std::endl;
 
-        double alpha = (density*0.6022*Lx1*Ly1*Lz1) / totalMassConcentration;
+        double alpha = (density*0.6022*Lx*Ly*Lz) / totalMassConcentration;
 
         std::cout << "Density scaling factor: " << alpha << std::endl;
 
@@ -213,19 +192,6 @@ int main(int argc, char *argv[])
     {
         out << "structure toppar/" << molecule.name << ".pdb" << std::endl;
         out << "  number " << molecule.count << std::endl;
-        float Lx, Ly, Lz;
-        if (molecule.compartment == 1)
-        {
-            Lx = Lx1;
-            Ly = Ly1;
-            Lz = Lz1;
-        }
-        else
-        {
-            Lx = Lx2;
-            Ly = Ly2;
-            Lz = Lz2;
-        }
         out << "  inside box 0. 0. 0. " << Lx*10.0f << " " << Ly*10.0f << " " << Lz*10.0f << std::endl;
         out << "end structure" << std::endl;
     }
