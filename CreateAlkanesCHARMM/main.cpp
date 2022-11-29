@@ -17,12 +17,12 @@ int main(int argc, char *argv[])
     alkanePDB.atoms = (PDBAtom*)calloc(MAX_ATOM_COUNT*4, sizeof(PDBAtom));
 
     std::ofstream file;
-    file.open("alkanes.itp");
+    file.open("alkanes.rtp");
 
     for (int atomCount = 1; atomCount <= MAX_ATOM_COUNT; atomCount++)
     {    
         //std::string resName = "C" + std::to_string(atomCount) + "H" + std::to_string(atomCount*2 + 2);
-        std::string resName = "C" + std::to_string(atomCount);
+        std::string resName = "C" + std::to_string(atomCount) + "H";
         
 
         file << "[ " << resName << " ]" << std::endl;
@@ -64,6 +64,8 @@ int main(int argc, char *argv[])
         file << "      C" << atomCount << "    H" << atomCount << "1" << std::endl;
         file << "      C" << atomCount << "    H" << atomCount << "2" << std::endl;
         file << "      C" << atomCount << "    H" << atomCount << "3" << std::endl;
+
+        file << std::endl;
         
         float x = 0.0;
         float y = 0.0;
