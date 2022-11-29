@@ -1,18 +1,31 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
-#define MAX_ATOM_COUNT   20
+#include "pdbio.h"
+
+#define CC_BOND_DISTANCE 1.540
+#define CCC_BOND_ANGLE   114.0
+#define CH_BOND_DISTANCE 1.0
+#define HCH_BOND_ANGLE   110.0
+#define MAX_ATOM_COUNT   100
 
 int main(int argc, char *argv[])
 {
-    for (int atomCount = 1; atomCount <= MAX_ATOM_COUNT; atomCount++)
-    {
-        std::ofstream file;
-        std::string molname = "C" + std::to_string(atomCount) + "H" + std::to_string(atomCount*2 + 2);
-        file.open(molname + ".top");
+    PDB alkanePDB;
+    alkanePDB.atoms = (PDBAtom*)calloc(MAX_ATOM_COUNT*4, sizeof(PDBAtom));
 
-        file << "[ " << molname << " ]" << std::endl;
+    std::ofstream file;
+    file.open("alkanes.itp");
+
+    for (int atomCount = 1; atomCount <= MAX_ATOM_COUNT; atomCount++)
+    {    
+        //std::string resName = "C" + std::to_string(atomCount) + "H" + std::to_string(atomCount*2 + 2);
+        std::string resName = "C" + std::to_string(atomCount);
+        
+
+        file << "[ " << resName << " ]" << std::endl;
         file << "  [ atoms ]" << std::endl;
         
         file << "       C1    CC33A -0.2700   1" << std::endl;
@@ -51,8 +64,140 @@ int main(int argc, char *argv[])
         file << "      C" << atomCount << "    H" << atomCount << "1" << std::endl;
         file << "      C" << atomCount << "    H" << atomCount << "2" << std::endl;
         file << "      C" << atomCount << "    H" << atomCount << "3" << std::endl;
+        
+        float x = 0.0;
+        float y = 0.0;
+        float z = 0.0;
 
-        file.close();
+        float d = CC_BOND_DISTANCE;
+        float alpha = (0.5*CCC_BOND_ANGLE)*M_PI/180.0;
+
+        int atomIndex = 0;
+
+        for (int i = 0; i < atomCount; i++)
+        {
+            alkanePDB.atoms[atomIndex].id = i + 1;
+            sprintf(alkanePDB.atoms[atomIndex].name, "C%d", i+1);
+            alkanePDB.atoms[atomIndex].chain = ' ';
+            sprintf(alkanePDB.atoms[atomIndex].resName, "%s", resName.c_str());
+
+            alkanePDB.atoms[atomIndex].altLoc = ' ';
+            alkanePDB.atoms[atomIndex].resid = 1;
+            alkanePDB.atoms[atomIndex].x = x;
+            alkanePDB.atoms[atomIndex].y = y;
+            alkanePDB.atoms[atomIndex].z = z;
+
+            sprintf(alkanePDB.atoms[atomIndex].segment, " ");
+
+            alkanePDB.atoms[atomIndex].occupancy = 0.0;
+            alkanePDB.atoms[atomIndex].beta = 0.0;
+
+            int numHydrogens = (i == 0 || i == atomCount - 1) ? 3 : 2;
+            for (int deltaIndex = 1; deltaIndex <= numHydrogens; deltaIndex ++)
+            {
+                alkanePDB.atoms[atomIndex + deltaIndex].id = i + 1;
+                alkanePDB.atoms[atomIndex + deltaIndex].chain = ' ';
+                sprintf(alkanePDB.atoms[atomIndex + deltaIndex].resName, "%s", resName.c_str());
+
+                alkanePDB.atoms[atomIndex + deltaIndex].altLoc = ' ';
+                alkanePDB.atoms[atomIndex + deltaIndex].resid = 1;
+
+                sprintf(alkanePDB.atoms[atomIndex + deltaIndex].segment, " ");
+
+                alkanePDB.atoms[atomIndex + deltaIndex].occupancy = 0.0;
+                alkanePDB.atoms[atomIndex + deltaIndex].beta = 0.0;
+            }
+
+            float dH = CH_BOND_DISTANCE;
+            float alphaH = (0.5*HCH_BOND_ANGLE)*M_PI/180.0; 
+
+            float dx, dy, dy2, dz;
+
+            if (i == 0 || i == atomCount - 1)
+            {
+                dx = dH*sqrtf(1.0-(4.0/3.0)*sinf(alphaH)*sinf(alphaH));
+                dy = dH*2.0*sinf(alphaH)/sqrtf(3);
+                dy2 = dH*sinf(alphaH)/sqrtf(3);
+                dz = dH*sinf(alphaH);
+                if (i == atomCount - 1 && atomCount % 2 == 0)
+                {
+                    dy = -dy;
+                    dy2 = -dy2;
+                }
+            }
+            else
+            {
+                dx = 0.0f;
+                dy = dH*cosf(alphaH);
+                dz = dH*sinf(alphaH);
+                dy2 = 0.0f;
+            }
+
+            if (i == 0)
+            {
+                sprintf(alkanePDB.atoms[atomIndex + 1].name, "H%d1", i+1);
+                alkanePDB.atoms[atomIndex + 1].x = x - dx;
+                alkanePDB.atoms[atomIndex + 1].y = y + dy;
+                alkanePDB.atoms[atomIndex + 1].z = z;
+
+                sprintf(alkanePDB.atoms[atomIndex + 2].name, "H%d2", i+1);
+                alkanePDB.atoms[atomIndex + 2].x = x - dx;
+                alkanePDB.atoms[atomIndex + 2].y = y - dy2;
+                alkanePDB.atoms[atomIndex + 2].z = z + dz;
+
+                sprintf(alkanePDB.atoms[atomIndex + 3].name, "H%d3", i+1);
+                alkanePDB.atoms[atomIndex + 3].x = x - dx;
+                alkanePDB.atoms[atomIndex + 3].y = y - dy2;
+                alkanePDB.atoms[atomIndex + 3].z = z - dz;
+
+                atomIndex += 3;
+            }
+            else if (i == atomCount - 1)
+            {
+                sprintf(alkanePDB.atoms[atomIndex + 1].name, "H%d1", i+1);
+                alkanePDB.atoms[atomIndex + 1].x = x + dx;
+                alkanePDB.atoms[atomIndex + 1].y = y + dy;
+                alkanePDB.atoms[atomIndex + 1].z = z;
+
+                sprintf(alkanePDB.atoms[atomIndex + 2].name, "H%d2", i+1);
+                alkanePDB.atoms[atomIndex + 2].x = x + dx;
+                alkanePDB.atoms[atomIndex + 2].y = y - dy2;
+                alkanePDB.atoms[atomIndex + 2].z = z + dz;
+
+                sprintf(alkanePDB.atoms[atomIndex + 3].name, "H%d3", i+1);
+                alkanePDB.atoms[atomIndex + 3].x = x + dx;
+                alkanePDB.atoms[atomIndex + 3].y = y - dy2;
+                alkanePDB.atoms[atomIndex + 3].z = z - dz;
+
+                atomIndex += 3;
+            }
+            else
+            {
+                sprintf(alkanePDB.atoms[atomIndex + 1].name, "H%d1", i+1);
+                alkanePDB.atoms[atomIndex + 1].x = x;
+                alkanePDB.atoms[atomIndex + 1].y = (i % 2) ? y + dy : y - dy;
+                alkanePDB.atoms[atomIndex + 1].z = z + dz;
+
+                sprintf(alkanePDB.atoms[atomIndex + 2].name, "H%d2", i+1);
+                alkanePDB.atoms[atomIndex + 2].x = x;
+                alkanePDB.atoms[atomIndex + 2].y = (i % 2) ? y + dy : y - dy;
+                alkanePDB.atoms[atomIndex + 2].z = z - dz;
+
+                atomIndex += 2;
+            }
+
+            x += d*sinf(alpha);
+            y = (i % 2) ? 0.0 : d*cosf(alpha);
+            atomIndex ++;
+        }
+
+        std::string filename = resName + ".pdb";
+
+        alkanePDB.atomCount = atomIndex;
+
+        writePDB(filename.c_str(), &alkanePDB);
     }
+
+    file.close();
 
 }

@@ -1,1 +1,3 @@
 add_executable(create_alkanes_charmm main.cpp)
+
+target_link_libraries(create_alkanes_charmm PRIVATE mdio)
