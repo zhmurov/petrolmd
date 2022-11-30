@@ -4,7 +4,7 @@ GMX=/usr/local/gromacs/bin/gmx
 for filename in *.pdb; do
     name=$(basename $filename .pdb)
     # Run GROMACS to create top files for all the PDBs in the folder
-    $GMX pdb2gmx -f $filename -o ${name}.gro -p ${name}.top -i ${name}_posre.itp <<< $'16\n3\n'
+    $GMX pdb2gmx -f $filename -o ${name}.gro -p ${name}.top -i ${name}_posre.itp -ff trappeua -water tip4p
     # Create a copy of the topology that can be included
     cp ${name}.top ${name}.itp
     # Remove th1e header
