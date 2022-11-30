@@ -23,8 +23,8 @@ int main(int argc, char *argv[])
 
     for (int atomCount = 1; atomCount <= MAX_ATOM_COUNT; atomCount++)
     {    
-        //std::string resName = "C" + std::to_string(atomCount) + "H" + std::to_string(atomCount*2 + 2);
-        std::string resName = "C" + std::to_string(atomCount) + "H";
+        std::string resName = "C" + std::to_string(atomCount) + "H" + std::to_string(atomCount*2 + 2);
+        //std::string resName = "C" + std::to_string(atomCount) + "H";
         
 
         file << "[ " << resName << " ]" << std::endl;
@@ -239,7 +239,22 @@ int main(int argc, char *argv[])
         alkanePDB.atomCount = atomIndex;
 
         writePDB(filename.c_str(), &alkanePDB);
-    }
+
+        std::string grofilename = resName + ".gro";
+
+        FILE* grofile = fopen(grofilename.c_str(), "w");
+
+        fprintf(grofile, "%s\n", resName.c_str());
+        fprintf(grofile, "%d\n", alkanePDB.atomCount);
+
+        for (int i = 0; i < alkanePDB.atomCount; i++)
+        {
+            fprintf(grofile, "%5d%-5.5s%5.5s%5d", alkanePDB.atoms[i].resid % 100000, resName.c_str(), alkanePDB.atoms[i].name, (i + 1) % 100000);
+            fprintf(grofile, "%8.3f%8.3f%8.3f\n", alkanePDB.atoms[i].x, alkanePDB.atoms[i].y, alkanePDB.atoms[i].z);
+        }
+
+        fclose(grofile);
+    }  
 
     file.close();
 
