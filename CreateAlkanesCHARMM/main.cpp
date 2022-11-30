@@ -11,6 +11,8 @@
 #define HCH_BOND_ANGLE   110.0
 #define MAX_ATOM_COUNT   100
 
+#define CH_BOND_DISTANCE_METHANE 1.087
+
 int main(int argc, char *argv[])
 {
     PDB alkanePDB;
@@ -95,6 +97,10 @@ int main(int argc, char *argv[])
             alkanePDB.atoms[atomIndex].beta = 0.0;
 
             int numHydrogens = (i == 0 || i == atomCount - 1) ? 3 : 2;
+            if (atomCount == 1)
+            {
+                numHydrogens = 4;
+            }
             for (int deltaIndex = 1; deltaIndex <= numHydrogens; deltaIndex ++)
             {
                 alkanePDB.atoms[atomIndex + deltaIndex].id = i + 1;
@@ -115,79 +121,114 @@ int main(int argc, char *argv[])
 
             float dx, dy, dy2, dz;
 
-            if (i == 0 || i == atomCount - 1)
+            // The methane molecule has 4 hydrogens and dealt with separately (below)
+            if (atomCount != 1)
             {
-                dx = dH*sqrtf(1.0-(4.0/3.0)*sinf(alphaH)*sinf(alphaH));
-                dy = dH*2.0*sinf(alphaH)/sqrtf(3);
-                dy2 = dH*sinf(alphaH)/sqrtf(3);
-                dz = dH*sinf(alphaH);
-                if (i == atomCount - 1 && atomCount % 2 == 0)
+                // First and last carbons have three hydrogens
+                if (i == 0 || i == atomCount - 1)
                 {
-                    dy = -dy;
-                    dy2 = -dy2;
+                    dx = dH*sqrtf(1.0-(4.0/3.0)*sinf(alphaH)*sinf(alphaH));
+                    dy = dH*2.0*sinf(alphaH)/sqrtf(3);
+                    dy2 = dH*sinf(alphaH)/sqrtf(3);
+                    dz = dH*sinf(alphaH);
+                    if (i == atomCount - 1 && atomCount % 2 == 0)
+                    {
+                        dy = -dy;
+                        dy2 = -dy2;
+                    }
+                }
+                else
+                {
+                    dx = 0.0f;
+                    dy = dH*cosf(alphaH);
+                    dz = dH*sinf(alphaH);
+                    dy2 = 0.0f;
+                }
+
+                // First carbon
+                if (i == 0)
+                {
+                    sprintf(alkanePDB.atoms[atomIndex + 1].name, "H%d1", i+1);
+                    alkanePDB.atoms[atomIndex + 1].x = x - dx;
+                    alkanePDB.atoms[atomIndex + 1].y = y + dy;
+                    alkanePDB.atoms[atomIndex + 1].z = z;
+
+                    sprintf(alkanePDB.atoms[atomIndex + 2].name, "H%d2", i+1);
+                    alkanePDB.atoms[atomIndex + 2].x = x - dx;
+                    alkanePDB.atoms[atomIndex + 2].y = y - dy2;
+                    alkanePDB.atoms[atomIndex + 2].z = z + dz;
+
+                    sprintf(alkanePDB.atoms[atomIndex + 3].name, "H%d3", i+1);
+                    alkanePDB.atoms[atomIndex + 3].x = x - dx;
+                    alkanePDB.atoms[atomIndex + 3].y = y - dy2;
+                    alkanePDB.atoms[atomIndex + 3].z = z - dz;
+
+                    atomIndex += 3;
+                }
+                // Last carbon
+                else if (i == atomCount - 1)
+                {
+                    sprintf(alkanePDB.atoms[atomIndex + 1].name, "H%d1", i+1);
+                    alkanePDB.atoms[atomIndex + 1].x = x + dx;
+                    alkanePDB.atoms[atomIndex + 1].y = y + dy;
+                    alkanePDB.atoms[atomIndex + 1].z = z;
+
+                    sprintf(alkanePDB.atoms[atomIndex + 2].name, "H%d2", i+1);
+                    alkanePDB.atoms[atomIndex + 2].x = x + dx;
+                    alkanePDB.atoms[atomIndex + 2].y = y - dy2;
+                    alkanePDB.atoms[atomIndex + 2].z = z + dz;
+
+                    sprintf(alkanePDB.atoms[atomIndex + 3].name, "H%d3", i+1);
+                    alkanePDB.atoms[atomIndex + 3].x = x + dx;
+                    alkanePDB.atoms[atomIndex + 3].y = y - dy2;
+                    alkanePDB.atoms[atomIndex + 3].z = z - dz;
+
+                    atomIndex += 3;
+                }
+                // Carbon atoms in the middle
+                else
+                {
+                    sprintf(alkanePDB.atoms[atomIndex + 1].name, "H%d1", i+1);
+                    alkanePDB.atoms[atomIndex + 1].x = x;
+                    alkanePDB.atoms[atomIndex + 1].y = (i % 2) ? y + dy : y - dy;
+                    alkanePDB.atoms[atomIndex + 1].z = z + dz;
+
+                    sprintf(alkanePDB.atoms[atomIndex + 2].name, "H%d2", i+1);
+                    alkanePDB.atoms[atomIndex + 2].x = x;
+                    alkanePDB.atoms[atomIndex + 2].y = (i % 2) ? y + dy : y - dy;
+                    alkanePDB.atoms[atomIndex + 2].z = z - dz;
+
+                    atomIndex += 2;
                 }
             }
+            // Methane (4 hydrogens)
             else
             {
-                dx = 0.0f;
-                dy = dH*cosf(alphaH);
-                dz = dH*sinf(alphaH);
-                dy2 = 0.0f;
-            }
+                float r = CH_BOND_DISTANCE_METHANE;
 
-            if (i == 0)
-            {
                 sprintf(alkanePDB.atoms[atomIndex + 1].name, "H%d1", i+1);
-                alkanePDB.atoms[atomIndex + 1].x = x - dx;
-                alkanePDB.atoms[atomIndex + 1].y = y + dy;
-                alkanePDB.atoms[atomIndex + 1].z = z;
+                alkanePDB.atoms[atomIndex + 1].x = x + r * sqrtf(8.0/9.0);
+                alkanePDB.atoms[atomIndex + 1].y = y + r * 0.0;
+                alkanePDB.atoms[atomIndex + 1].z = z - r * 1.0/3.0;
 
                 sprintf(alkanePDB.atoms[atomIndex + 2].name, "H%d2", i+1);
-                alkanePDB.atoms[atomIndex + 2].x = x - dx;
-                alkanePDB.atoms[atomIndex + 2].y = y - dy2;
-                alkanePDB.atoms[atomIndex + 2].z = z + dz;
+                alkanePDB.atoms[atomIndex + 2].x = x - r * sqrtf(2.0/9.0);
+                alkanePDB.atoms[atomIndex + 2].y = y + r * sqrtf(2.0/3.0);
+                alkanePDB.atoms[atomIndex + 2].z = z - r * 1.0/3.0;
 
                 sprintf(alkanePDB.atoms[atomIndex + 3].name, "H%d3", i+1);
-                alkanePDB.atoms[atomIndex + 3].x = x - dx;
-                alkanePDB.atoms[atomIndex + 3].y = y - dy2;
-                alkanePDB.atoms[atomIndex + 3].z = z - dz;
+                alkanePDB.atoms[atomIndex + 3].x = x - r * sqrtf(2.0/9.0);
+                alkanePDB.atoms[atomIndex + 3].y = y - r * sqrtf(2.0/3.0);
+                alkanePDB.atoms[atomIndex + 3].z = z - r * 1.0/3.0;
 
-                atomIndex += 3;
+                sprintf(alkanePDB.atoms[atomIndex + 4].name, "H%d4", i+1);
+                alkanePDB.atoms[atomIndex + 4].x = x + r * 0.0;
+                alkanePDB.atoms[atomIndex + 4].y = y + r * 0.0;
+                alkanePDB.atoms[atomIndex + 4].z = z + r * 1.0;
+
+                atomIndex += 4;
             }
-            else if (i == atomCount - 1)
-            {
-                sprintf(alkanePDB.atoms[atomIndex + 1].name, "H%d1", i+1);
-                alkanePDB.atoms[atomIndex + 1].x = x + dx;
-                alkanePDB.atoms[atomIndex + 1].y = y + dy;
-                alkanePDB.atoms[atomIndex + 1].z = z;
-
-                sprintf(alkanePDB.atoms[atomIndex + 2].name, "H%d2", i+1);
-                alkanePDB.atoms[atomIndex + 2].x = x + dx;
-                alkanePDB.atoms[atomIndex + 2].y = y - dy2;
-                alkanePDB.atoms[atomIndex + 2].z = z + dz;
-
-                sprintf(alkanePDB.atoms[atomIndex + 3].name, "H%d3", i+1);
-                alkanePDB.atoms[atomIndex + 3].x = x + dx;
-                alkanePDB.atoms[atomIndex + 3].y = y - dy2;
-                alkanePDB.atoms[atomIndex + 3].z = z - dz;
-
-                atomIndex += 3;
-            }
-            else
-            {
-                sprintf(alkanePDB.atoms[atomIndex + 1].name, "H%d1", i+1);
-                alkanePDB.atoms[atomIndex + 1].x = x;
-                alkanePDB.atoms[atomIndex + 1].y = (i % 2) ? y + dy : y - dy;
-                alkanePDB.atoms[atomIndex + 1].z = z + dz;
-
-                sprintf(alkanePDB.atoms[atomIndex + 2].name, "H%d2", i+1);
-                alkanePDB.atoms[atomIndex + 2].x = x;
-                alkanePDB.atoms[atomIndex + 2].y = (i % 2) ? y + dy : y - dy;
-                alkanePDB.atoms[atomIndex + 2].z = z - dz;
-
-                atomIndex += 2;
-            }
-
+            
             x += d*sinf(alpha);
             y = (i % 2) ? 0.0 : d*cosf(alpha);
             atomIndex ++;
