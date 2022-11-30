@@ -332,7 +332,7 @@ At this stage, we need to manually edit the configuration file for packmol to se
 Now we need to transfer coordinates of the water molecules from the pre-generated water box into our system. The former are in the ``out.gro`` file, the later - in the ``${SYSTEM_NAME}_solv.gro`` file. Since we imposed the limit on the number of solvent molecules in both cases and assuming that this number was reached, it should be the same in both cases.
 
     .. code-block:: shell
-        top2psf yamburg_recomb.top toppar/ yamburg_recomb.psf
+        top2psf ${SYSTEM_NAME}.top toppar/ ${SYSTEM_NAME}.psf
         $GMX grompp -f em.mdp -c ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top -o em.tpr
         $GMX mdrun -deffnm em
         $GMX grompp -f nvt.mdp -c em.gro -p ${SYSTEM_NAME}.top -o nvt.tpr
