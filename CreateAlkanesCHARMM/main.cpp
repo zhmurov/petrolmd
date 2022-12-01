@@ -24,50 +24,84 @@ int main(int argc, char *argv[])
     for (int atomCount = 1; atomCount <= MAX_ATOM_COUNT; atomCount++)
     {    
         std::string resName = "C" + std::to_string(atomCount) + "H" + std::to_string(atomCount*2 + 2);
-        //std::string resName = "C" + std::to_string(atomCount) + "H";
-        
+        std::string resNameShort = "C" + std::to_string(atomCount);
 
+
+        file << "[ bondedtypes ]" << std::endl;
+        file << "; Col 1: Type of bond " << std::endl;
+        file << "; Col 2: Type of angles " << std::endl;
+        file << "; Col 3: Type of proper dihedrals " << std::endl;
+        file << "; Col 4: Type of improper dihedrals " << std::endl;
+        file << "; Col 5: Generate all dihedrals if 1, only heavy atoms of 0. " << std::endl;
+        file << "; Col 6: Number of excluded neighbors for nonbonded interactions " << std::endl;
+        file << "; Col 7: Generate 1,4 interactions between pairs of hydrogens if 1 " << std::endl;
+        file << "; Col 8: Remove propers over the same bond as an improper if it is 1 " << std::endl;
+        file << "; bonds  angles  dihedrals  impropers  all_dihedrals  nrexcl  HH14  RemoveDih " << std::endl;
+        file << "1       5        9          2            1           3      1       0" << std::endl;
+        
         file << "[ " << resName << " ]" << std::endl;
-        file << "  [ atoms ]" << std::endl;
-        
-        file << "       C1    CC33A -0.2700   1" << std::endl;
-        file << "      H11    HCA3A  0.0900   1" << std::endl;
-        file << "      H12    HCA3A  0.0900   1" << std::endl;
-        file << "      H13    HCA3A  0.0900   1" << std::endl;
 
-        for (int i = 1; i < atomCount - 1; i++)
+        // The methane molecule has 4 hydrogens and dealt with separately (below)
+        if (atomCount != 1)
         {
-            file << "       C" << i + 1 << "    CC32A -0.1800   " << i + 1 << std::endl;
-            file << "      H" << i + 1 << "1    HCA2A  0.0900   " << i + 1 << std::endl;
-            file << "      H" << i + 1 << "2    HCA2A  0.0900   " << i + 1 << std::endl;
+            file << "  [ atoms ]" << std::endl;
+            file << "       C1    CC33A -0.2700   1" << std::endl;
+            file << "      H11    HCA3A  0.0900   1" << std::endl;
+            file << "      H12    HCA3A  0.0900   1" << std::endl;
+            file << "      H13    HCA3A  0.0900   1" << std::endl;
+
+            for (int i = 1; i < atomCount - 1; i++)
+            {
+                file << "       C" << i + 1 << "    CC32A -0.1800   " << i + 1 << std::endl;
+                file << "      H" << i + 1 << "1    HCA2A  0.0900   " << i + 1 << std::endl;
+                file << "      H" << i + 1 << "2    HCA2A  0.0900   " << i + 1 << std::endl;
+            }
+
+            file << "       C" << atomCount << "    CC33A -0.2700   " << atomCount << std::endl;
+            file << "      H" << atomCount << "1    HCA3A  0.0900   " << atomCount << std::endl;
+            file << "      H" << atomCount << "2    HCA3A  0.0900   " << atomCount << std::endl;
+            file << "      H" << atomCount << "3    HCA3A  0.0900   " << atomCount << std::endl;
+
+            file << "  [ bonds ]" << std::endl;
+            for (int i = 1; i < atomCount; i++)
+            {
+                file << "      C" << i << "    C" << i + 1 << std::endl;
+            }
+
+            file << "      C1    H11" << std::endl;
+            file << "      C1    H12" << std::endl;
+            file << "      C1    H13" << std::endl;
+
+            for (int i = 2; i < atomCount; i++)
+            {
+                file << "      C" << i << "    H" << i << "1" << std::endl;
+                file << "      C" << i << "    H" << i << "2" << std::endl;
+            }
+
+            file << "      C" << atomCount << "    H" << atomCount << "1" << std::endl;
+            file << "      C" << atomCount << "    H" << atomCount << "2" << std::endl;
+            file << "      C" << atomCount << "    H" << atomCount << "3" << std::endl;
+
+            file << std::endl;
         }
-
-        file << "       C" << atomCount << "    CC33A -0.2700   " << atomCount << std::endl;
-        file << "      H" << atomCount << "1    HCA3A  0.0900   " << atomCount << std::endl;
-        file << "      H" << atomCount << "2    HCA3A  0.0900   " << atomCount << std::endl;
-        file << "      H" << atomCount << "3    HCA3A  0.0900   " << atomCount << std::endl;
-
-        file << "  [ bonds ]" << std::endl;
-        for (int i = 1; i < atomCount; i++)
+        else
+        // Methane
         {
-            file << "      C" << i << "    C" << i + 1 << std::endl; 
+            file << "  [ atoms ]" << std::endl;
+            file << "       C1    CC33A -0.3600   1" << std::endl;
+            file << "      H11    HCA3A  0.0900   1" << std::endl;
+            file << "      H12    HCA3A  0.0900   1" << std::endl;
+            file << "      H13    HCA3A  0.0900   1" << std::endl;
+            file << "      H14    HCA3A  0.0900   1" << std::endl;
+
+            file << "  [ bonds ]" << std::endl;
+            file << "      C1    H11" << std::endl;
+            file << "      C1    H12" << std::endl;
+            file << "      C1    H13" << std::endl;
+            file << "      C1    H14" << std::endl;
+
+            file << std::endl;
         }
-
-        file << "      C1    H11" << std::endl;
-        file << "      C1    H12" << std::endl;
-        file << "      C1    H13" << std::endl;
-       
-        for (int i = 2; i < atomCount; i++)
-        {
-            file << "      C" << i << "    H" << i << "1" << std::endl;
-            file << "      C" << i << "    H" << i << "2" << std::endl;
-        }
-
-        file << "      C" << atomCount << "    H" << atomCount << "1" << std::endl;
-        file << "      C" << atomCount << "    H" << atomCount << "2" << std::endl;
-        file << "      C" << atomCount << "    H" << atomCount << "3" << std::endl;
-
-        file << std::endl;
         
         float x = 0.0;
         float y = 0.0;
@@ -83,7 +117,7 @@ int main(int argc, char *argv[])
             alkanePDB.atoms[atomIndex].id = i + 1;
             sprintf(alkanePDB.atoms[atomIndex].name, "C%d", i+1);
             alkanePDB.atoms[atomIndex].chain = ' ';
-            sprintf(alkanePDB.atoms[atomIndex].resName, "%s", resName.c_str());
+            sprintf(alkanePDB.atoms[atomIndex].resName, "%s", resNameShort.c_str());
 
             alkanePDB.atoms[atomIndex].altLoc = ' ';
             alkanePDB.atoms[atomIndex].resid = 1;
@@ -105,7 +139,7 @@ int main(int argc, char *argv[])
             {
                 alkanePDB.atoms[atomIndex + deltaIndex].id = i + 1;
                 alkanePDB.atoms[atomIndex + deltaIndex].chain = ' ';
-                sprintf(alkanePDB.atoms[atomIndex + deltaIndex].resName, "%s", resName.c_str());
+                sprintf(alkanePDB.atoms[atomIndex + deltaIndex].resName, "%s", resNameShort.c_str());
 
                 alkanePDB.atoms[atomIndex + deltaIndex].altLoc = ' ';
                 alkanePDB.atoms[atomIndex + deltaIndex].resid = 1;
@@ -250,7 +284,7 @@ int main(int argc, char *argv[])
         for (int i = 0; i < alkanePDB.atomCount; i++)
         {
             fprintf(grofile, "%5d%-5.5s%5.5s%5d", alkanePDB.atoms[i].resid % 100000, resName.c_str(), alkanePDB.atoms[i].name, (i + 1) % 100000);
-            fprintf(grofile, "%8.3f%8.3f%8.3f\n", alkanePDB.atoms[i].x, alkanePDB.atoms[i].y, alkanePDB.atoms[i].z);
+            fprintf(grofile, "%8.3f%8.3f%8.3f\n", 0.1*alkanePDB.atoms[i].x, 0.1*alkanePDB.atoms[i].y, 0.1*alkanePDB.atoms[i].z);
         }
 
         fclose(grofile);
