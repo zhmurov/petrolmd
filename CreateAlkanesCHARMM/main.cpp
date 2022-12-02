@@ -21,23 +21,24 @@ int main(int argc, char *argv[])
     std::ofstream file;
     file.open("alkanes.rtp");
 
+    file << "[ bondedtypes ]" << std::endl;
+    file << "; Col 1: Type of bond " << std::endl;
+    file << "; Col 2: Type of angles " << std::endl;
+    file << "; Col 3: Type of proper dihedrals " << std::endl;
+    file << "; Col 4: Type of improper dihedrals " << std::endl;
+    file << "; Col 5: Generate all dihedrals if 1, only heavy atoms of 0. " << std::endl;
+    file << "; Col 6: Number of excluded neighbors for nonbonded interactions " << std::endl;
+    file << "; Col 7: Generate 1,4 interactions between pairs of hydrogens if 1 " << std::endl;
+    file << "; Col 8: Remove propers over the same bond as an improper if it is 1 " << std::endl;
+    file << "; bonds  angles  dihedrals  impropers  all_dihedrals  nrexcl  HH14  RemoveDih " << std::endl;
+    file << "1       5        9          2            1           3      1       0" << std::endl;
+    file << std::endl;
+
     for (int atomCount = 1; atomCount <= MAX_ATOM_COUNT; atomCount++)
     {    
         std::string resName = "C" + std::to_string(atomCount) + "H" + std::to_string(atomCount*2 + 2);
+        resName.erase(std::min(static_cast<int>(resName.size()), 5), std::string::npos);
         std::string resNameShort = "C" + std::to_string(atomCount);
-
-
-        file << "[ bondedtypes ]" << std::endl;
-        file << "; Col 1: Type of bond " << std::endl;
-        file << "; Col 2: Type of angles " << std::endl;
-        file << "; Col 3: Type of proper dihedrals " << std::endl;
-        file << "; Col 4: Type of improper dihedrals " << std::endl;
-        file << "; Col 5: Generate all dihedrals if 1, only heavy atoms of 0. " << std::endl;
-        file << "; Col 6: Number of excluded neighbors for nonbonded interactions " << std::endl;
-        file << "; Col 7: Generate 1,4 interactions between pairs of hydrogens if 1 " << std::endl;
-        file << "; Col 8: Remove propers over the same bond as an improper if it is 1 " << std::endl;
-        file << "; bonds  angles  dihedrals  impropers  all_dihedrals  nrexcl  HH14  RemoveDih " << std::endl;
-        file << "1       5        9          2            1           3      1       0" << std::endl;
         
         file << "[ " << resName << " ]" << std::endl;
 
