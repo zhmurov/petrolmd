@@ -1,6 +1,8 @@
 #!/bin/bash
 GMX=/usr/local/gromacs/bin/gmx
 
+mkdir toppar
+
 for filename in *.pdb; do
     name=$(basename $filename .pdb)
     # Run GROMACS to create top files for all the PDBs in the folder
@@ -15,4 +17,6 @@ for filename in *.pdb; do
     sed -i "s/Other/${name}/g" ${name}.itp
     # Combine topologies into one file
     # cat ${name}.itp >> alkanes.itp
+    # Copy the topolgy to separate folder
+    cp ${name}.itp toppar/${name}.itp
 done
