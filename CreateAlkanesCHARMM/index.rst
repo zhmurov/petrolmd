@@ -1,5 +1,5 @@
 Create topologies and coordinates for the alkanes in CHARMM36
-=============================================================
+-------------------------------------------------------------
 
 Make sure to use patched CHARMM36 forcefield from here: https://gitlab.com/artemzhmurov/charmm36 . 
 
