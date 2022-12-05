@@ -33,7 +33,19 @@ int main(int argc, char *argv[])
             alkanePDB.atoms[i].id = i + 1;
             sprintf(alkanePDB.atoms[i].name, "C");
             alkanePDB.atoms[i].chain = ' ';
-            std::string resName = (i == 0 || i == atomCount - 1) ? "CH3" : "CH2";
+            std::string resName;
+            if (atomCount == 0)
+            {
+                resName = "CH4";
+            }
+            else if (i == 0 || i == atomCount - 1)
+            {
+                resName = "CH3";
+            }
+            else
+            {
+                resName = "CH2";
+            }
             sprintf(alkanePDB.atoms[i].resName, "%s", resName.c_str());
 
             alkanePDB.atoms[i].altLoc = ' ';
