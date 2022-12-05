@@ -36,7 +36,10 @@ Optionally, one can set the installation path by adding ``-DCMAKE_INSTALL_PREFIX
 Force-field and additional software:
 ====================================
 
-1. Get the forcefield and make it available to GROMACS. Assuming that GROMACS in installed at ``/usr/local/gromacs``:
+TraPPE-UA forcefield
+--------------------
+
+Get the forcefield and make it available to GROMACS. Assuming that GROMACS in installed at ``/usr/local/gromacs``:
 
     .. code-block:: shell
 
@@ -58,7 +61,21 @@ Now, copy the result to GROMACS installation folder:
     .. code-block:: shell
         sudo cp -pr trappeua/trappeua.ff /usr/local/gromacs/share/gromacs/top/
 
-2. To create the coordinates for a box of molecules, we can use Packmol software. You will need ``gfortran``, which you can install by running ``sudo apt install gfortran``. To get and install Packmol:
+CHARMM36 forcefield
+-------------------
+
+Alkanes topologies and coordinates are not standard in CHARMM forcefield. Hence, we need to use the patched version of the forcefield. The installation is similar to TraPPE-UA:
+
+   .. code-block:: shell
+
+      git clone git@gitlab.com:artemzhmurov/charmm36.git
+      sudo cp -pr charmm36-jul2021.ff /usr/local/gromacs/share/gromacs/top/
+
+
+PackMol
+-------
+
+To create the coordinates for a box of molecules, we can use Packmol software. You will need ``gfortran``, which you can install by running ``sudo apt install gfortran``. To get and install Packmol:
 
     .. code-block:: shell
 
