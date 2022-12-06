@@ -1,0 +1,32 @@
+COMPND  cyclopropane_04.PDB                                                     
+HETATM    1  C                  -0.644  -0.576  -0.086                
+HETATM    2  C                   0.868  -0.582  -0.116                
+HETATM    3  C                   0.087  -0.335  -1.378                
+HETATM    4  C                  -1.404   0.524   0.566                
+HETATM    6  C                   1.662   0.512   0.503                
+HETATM    5  H                  -1.141  -1.561   0.043                
+HETATM    7  H                   1.361  -1.571  -0.007                
+HETATM   14  H                   0.082   0.682  -1.809                
+HETATM   15  H                   0.068  -1.115  -2.158                
+HETATM   11  H                  -2.468   0.511   0.222                
+HETATM   12  H                  -0.970   1.524   0.321                
+HETATM   13  H                  -1.391   0.397   1.676                
+HETATM    8  H                   2.711   0.492   0.116                
+HETATM    9  H                   1.693   0.385   1.614                
+HETATM   10  H                   1.226   1.515   0.277                
+CONECT    1    2    3    4    5                              
+CONECT    2    1    3    6    7                              
+CONECT    3    1    2   14   15                              
+CONECT    4    1   11   12   13                              
+CONECT    6    2    8    9   10                              
+CONECT    5    1                                             
+CONECT    7    2                                             
+CONECT   14    3                                             
+CONECT   15    3                                             
+CONECT   11    4                                             
+CONECT   12    4                                             
+CONECT   13    4                                             
+CONECT    8    6                                             
+CONECT    9    6                                             
+CONECT   10    6                                             
+END   

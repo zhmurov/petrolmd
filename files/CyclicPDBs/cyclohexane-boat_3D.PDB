@@ -1,0 +1,38 @@
+COMPND  cyclohexane_05.PDB                                                      
+HETATM    1  C                   1.344  -0.362  -0.043                
+HETATM   10  C                  -1.381  -0.253   0.041                
+HETATM   12  C                   0.817   0.312   1.230                
+HETATM   14  C                   0.735   0.290  -1.294                
+HETATM   15  C                  -0.720   0.329   1.300                
+HETATM   17  C                  -0.800   0.382  -1.231                
+HETATM    2  H                   2.458  -0.289  -0.081                
+HETATM    3  H                   1.102  -1.449  -0.025                
+HETATM    9  H                  -2.485  -0.087   0.080                
+HETATM   11  H                  -1.234  -1.357   0.010                
+HETATM    8  H                   1.238  -0.205   2.126                
+HETATM   13  H                   1.205   1.359   1.261                
+HETATM    4  H                   1.052  -0.283  -2.198                
+HETATM    5  H                   1.163   1.316  -1.407                
+HETATM    6  H                  -1.073  -0.241   2.192                
+HETATM   16  H                  -1.074   1.379   1.438                
+HETATM    7  H                  -1.113   1.453  -1.266                
+HETATM   18  H                  -1.252  -0.107  -2.127                
+CONECT    1   12   14    2    3                              
+CONECT   10   15   17    9   11                              
+CONECT   12    1   15    8   13                              
+CONECT   14    1   17    4    5                              
+CONECT   15   10   12    6   16                              
+CONECT   17   10   14    7   18                              
+CONECT    2    1                                             
+CONECT    3    1                                             
+CONECT    9   10                                             
+CONECT   11   10                                             
+CONECT    8   12                                             
+CONECT   13   12                                             
+CONECT    4   14                                             
+CONECT    5   14                                             
+CONECT    6   15                                             
+CONECT   16   15                                             
+CONECT    7   17                                             
+CONECT   18   17                                             
+END   

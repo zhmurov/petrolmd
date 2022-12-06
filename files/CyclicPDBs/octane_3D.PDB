@@ -1,0 +1,54 @@
+COMPND  octane_02.PDB                                                           
+HETATM    1  C                  -4.305  -0.820  -0.909                
+HETATM    2  C                  -3.177   0.135  -0.614                
+HETATM    3  C                  -1.867  -0.597  -0.413                
+HETATM    4  C                  -0.737   0.366  -0.117                
+HETATM    5  C                   0.572  -0.367   0.083                
+HETATM    6  C                   1.700   0.597   0.379                
+HETATM    7  C                   3.012  -0.135   0.580                
+HETATM    8  C                   4.139   0.821   0.875                
+HETATM    9  H                  -5.260  -0.259  -1.054                
+HETATM   10  H                  -4.442  -1.540  -0.067                
+HETATM   11  H                  -4.094  -1.403  -1.838                
+HETATM   25  H                  -3.418   0.729   0.308                
+HETATM   26  H                  -3.071   0.866  -1.458                
+HETATM   23  H                  -1.624  -1.191  -1.334                
+HETATM   24  H                  -1.971  -1.327   0.433                
+HETATM   21  H                  -0.981   0.959   0.804                
+HETATM   22  H                  -0.634   1.096  -0.962                
+HETATM   19  H                   0.815  -0.960  -0.837                
+HETATM   20  H                   0.469  -1.097   0.929                
+HETATM   17  H                   1.458   1.190   1.300                
+HETATM   18  H                   1.804   1.327  -0.466                
+HETATM   15  H                   3.252  -0.729  -0.341                
+HETATM   16  H                   2.906  -0.865   1.425                
+HETATM   12  H                   5.095   0.262   1.018                
+HETATM   13  H                   3.928   1.404   1.803                
+HETATM   14  H                   4.275   1.542   0.032                
+CONECT    1    2    9   10   11                              
+CONECT    2    1    3   25   26                              
+CONECT    3    2    4   23   24                              
+CONECT    4    3    5   21   22                              
+CONECT    5    4    6   19   20                              
+CONECT    6    5    7   17   18                              
+CONECT    7    6    8   15   16                              
+CONECT    8    7   12   13   14                              
+CONECT    9    1                                             
+CONECT   10    1                                             
+CONECT   11    1                                             
+CONECT   25    2                                             
+CONECT   26    2                                             
+CONECT   23    3                                             
+CONECT   24    3                                             
+CONECT   21    4                                             
+CONECT   22    4                                             
+CONECT   19    5                                             
+CONECT   20    5                                             
+CONECT   17    6                                             
+CONECT   18    6                                             
+CONECT   15    7                                             
+CONECT   16    7                                             
+CONECT   12    8                                             
+CONECT   13    8                                             
+CONECT   14    8                                             
+END   

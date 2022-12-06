@@ -1,0 +1,12 @@
+COMPND  freon_22_3D.PDB                                                         
+HETATM    1  C                   0.378  -0.077  -0.331                
+HETATM    2 Cl                   0.382  -1.860  -0.021                
+HETATM    4  F                  -0.888   0.437  -0.404                
+HETATM    5  F                   0.944   0.631   0.694                
+HETATM    3  H                   0.942   0.056  -1.297                
+CONECT    1    2    4    5    3                              
+CONECT    2    1                                             
+CONECT    4    1                                             
+CONECT    5    1                                             
+CONECT    3    1                                             
+END   

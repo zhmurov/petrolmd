@@ -1,0 +1,12 @@
+COMPND  dichloromethane_3D.PDB                                                  
+HETATM    1  C                  -0.275  -0.050  -0.018                
+HETATM    2 Cl                  -0.311  -1.789  -0.113                
+HETATM    3 Cl                  -1.400   0.590   1.145                
+HETATM    4  H                   0.750   0.255   0.293                
+HETATM    5  H                  -0.547   0.354  -1.018                
+CONECT    1    2    3    4    5                              
+CONECT    2    1                                             
+CONECT    3    1                                             
+CONECT    4    1                                             
+CONECT    5    1                                             
+END   

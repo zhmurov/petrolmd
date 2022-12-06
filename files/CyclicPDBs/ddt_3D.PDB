@@ -1,0 +1,58 @@
+COMPND  ddt_3D.PDB                                                              
+HETATM    1  C                   1.189   0.165  -0.583                
+HETATM    2  C                   0.043  -0.689  -1.066                
+HETATM    3  C                  -1.245   0.054  -0.823                
+HETATM    4  C                  -0.015  -2.166  -0.657                
+HETATM    5  C                   1.908  -0.089   0.586                
+HETATM    6  C                   2.945   0.745   0.995                
+HETATM    7  C                   3.272   1.869   0.236                
+HETATM    8  C                   2.549   2.150  -0.927                
+HETATM    9  C                   1.522   1.308  -1.327                
+HETATM   10  C                  -1.500   0.668   0.407                
+HETATM   11  C                  -2.686   1.362   0.633                
+HETATM   12  C                  -3.640   1.450  -0.382                
+HETATM   13  C                  -3.397   0.847  -1.620                
+HETATM   14  C                  -2.208   0.156  -1.834                
+HETATM   15 Cl                   4.538   2.907   0.730                
+HETATM   16 Cl                  -5.100   2.300  -0.117                
+HETATM   17 Cl                   1.568  -2.913  -0.895                
+HETATM   18 Cl                  -1.180  -3.007  -1.691                
+HETATM   19 Cl                  -0.521  -2.373   1.020                
+HETATM   27  H                   0.204  -0.700  -2.186                
+HETATM   28  H                   1.670  -0.956   1.221                
+HETATM   25  H                   3.493   0.514   1.923                
+HETATM   21  H                   2.783   3.041  -1.532                
+HETATM   26  H                   0.956   1.549  -2.241                
+HETATM   24  H                  -0.755   0.614   1.217                
+HETATM   22  H                  -2.858   1.835   1.612                
+HETATM   20  H                  -4.139   0.913  -2.431                
+HETATM   23  H                  -2.028  -0.311  -2.816                
+CONECT    1    2    5    9                                   
+CONECT    2    1    3    4   27                              
+CONECT    3    2   10   14                                   
+CONECT    4    2   17   18   19                              
+CONECT    5    1    6   28                                   
+CONECT    6    5    7   25                                   
+CONECT    7    6    8   15                                   
+CONECT    8    7    9   21                                   
+CONECT    9    1    8   26                                   
+CONECT   10    3   11   24                                   
+CONECT   11   10   12   22                                   
+CONECT   12   11   13   16                                   
+CONECT   13   12   14   20                                   
+CONECT   14    3   13   23                                   
+CONECT   15    7                                             
+CONECT   16   12                                             
+CONECT   17    4                                             
+CONECT   18    4                                             
+CONECT   19    4                                             
+CONECT   27    2                                             
+CONECT   28    5                                             
+CONECT   25    6                                             
+CONECT   21    8                                             
+CONECT   26    9                                             
+CONECT   24   10                                             
+CONECT   22   11                                             
+CONECT   20   13                                             
+CONECT   23   14                                             
+END   

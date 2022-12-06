@@ -1,0 +1,12 @@
+COMPND  carbon_tetrachloride_3D.PDB                                             
+HETATM    1  C                  -0.319   0.011  -0.579                
+HETATM    2 Cl                  -1.933   0.598  -0.963                
+HETATM    3 Cl                   0.769   0.367  -1.916                
+HETATM    4 Cl                   0.264   0.807   0.879                
+HETATM    5 Cl                  -0.374  -1.729  -0.315                
+CONECT    1    2    3    4    5                              
+CONECT    2    1                                             
+CONECT    3    1                                             
+CONECT    4    1                                             
+CONECT    5    1                                             
+END   

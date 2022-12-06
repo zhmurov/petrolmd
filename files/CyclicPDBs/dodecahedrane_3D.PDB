@@ -1,0 +1,82 @@
+COMPND  dodecahedrane_02.PDB                                                    
+HETATM    1  C                   0.983   2.350  -0.434                
+HETATM    2  C                   1.912   1.423   0.354                
+HETATM    3  C                  -0.304   2.531   0.374                
+HETATM    4  C                  -0.170   1.715   1.663                
+HETATM    5  C                  -1.460   1.944  -0.440                
+HETATM    6  C                  -2.042   0.767   0.348                
+HETATM    7  C                  -0.887   1.400  -1.751                
+HETATM    8  C                  -1.115  -0.113  -1.775                
+HETATM    9  C                   0.623   1.650  -1.747                
+HETATM   10  C                   1.329   0.292  -1.770                
+HETATM   11  C                  -1.246   0.627   1.645                
+HETATM   12  C                  -1.829  -0.504  -0.478                
+HETATM   13  C                   0.254  -0.800  -1.787                
+HETATM   14  C                   2.124   0.150  -0.470                
+HETATM   15  C                   1.200   1.030   1.650                
+HETATM   16  C                   0.385  -1.614  -0.497                
+HETATM   17  C                   1.542  -1.027   0.316                
+HETATM   18  C                   0.971  -0.483   1.625                
+HETATM   19  C                  -0.542  -0.732   1.623                
+HETATM   20  C                  -0.903  -1.431   0.314                
+HETATM   40  H                   1.471   3.335  -0.627                
+HETATM   39  H                   2.885   1.925   0.568                
+HETATM   38  H                  -0.486   3.609   0.602                
+HETATM   36  H                  -0.279   2.368   2.561                
+HETATM   35  H                  -2.242   2.716  -0.638                
+HETATM   34  H                  -3.126   0.927   0.561                
+HETATM   33  H                  -1.370   1.890  -2.631                
+HETATM   32  H                  -1.716  -0.412  -2.667                
+HETATM   37  H                   0.927   2.270  -2.624                
+HETATM   31  H                   1.998   0.206  -2.660                
+HETATM   30  H                  -1.916   0.714   2.534                
+HETATM   28  H                  -2.803  -1.005  -0.696                
+HETATM   27  H                   0.365  -1.453  -2.684                
+HETATM   26  H                   3.208  -0.010  -0.683                
+HETATM   29  H                   1.800   1.329   2.541                
+HETATM   25  H                   0.562  -2.692  -0.723                
+HETATM   24  H                   2.323  -1.800   0.511                
+HETATM   23  H                   1.456  -0.973   2.504                
+HETATM   22  H                  -0.843  -1.351   2.500                
+HETATM   21  H                  -1.396  -2.412   0.511                
+CONECT    1    2    3    9   40                              
+CONECT    2    1   14   15   39                              
+CONECT    3    1    4    5   38                              
+CONECT    4    3   11   15   36                              
+CONECT    5    3    6    7   35                              
+CONECT    6    5   11   12   34                              
+CONECT    7    5    8    9   33                              
+CONECT    8    7   12   13   32                              
+CONECT    9    1    7   10   37                              
+CONECT   10    9   13   14   31                              
+CONECT   11    4    6   19   30                              
+CONECT   12    6    8   20   28                              
+CONECT   13    8   10   16   27                              
+CONECT   14    2   10   17   26                              
+CONECT   15    2    4   18   29                              
+CONECT   16   13   17   20   25                              
+CONECT   17   14   16   18   24                              
+CONECT   18   15   17   19   23                              
+CONECT   19   11   18   20   22                              
+CONECT   20   12   16   19   21                              
+CONECT   40    1                                             
+CONECT   39    2                                             
+CONECT   38    3                                             
+CONECT   36    4                                             
+CONECT   35    5                                             
+CONECT   34    6                                             
+CONECT   33    7                                             
+CONECT   32    8                                             
+CONECT   37    9                                             
+CONECT   31   10                                             
+CONECT   30   11                                             
+CONECT   28   12                                             
+CONECT   27   13                                             
+CONECT   26   14                                             
+CONECT   29   15                                             
+CONECT   25   16                                             
+CONECT   24   17                                             
+CONECT   23   18                                             
+CONECT   22   19                                             
+CONECT   21   20                                             
+END   

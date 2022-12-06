@@ -1,0 +1,18 @@
+COMPND  trichloroethane_3D.PDB                                                  
+HETATM    1  C                  -0.762  -0.314   0.351                
+HETATM    4  C                   0.607  -0.322  -0.298                
+HETATM    6 Cl                   1.182   1.335  -0.516                
+HETATM    7 Cl                   1.753  -1.200   0.721                
+HETATM    8 Cl                   0.521  -1.111  -1.877                
+HETATM    2  H                  -1.490   0.240  -0.291                
+HETATM    3  H                  -0.712   0.185   1.350                
+HETATM    5  H                  -1.129  -1.360   0.490                
+CONECT    1    4    2    3    5                              
+CONECT    4    1    6    7    8                              
+CONECT    6    4                                             
+CONECT    7    4                                             
+CONECT    8    4                                             
+CONECT    2    1                                             
+CONECT    3    1                                             
+CONECT    5    1                                             
+END   

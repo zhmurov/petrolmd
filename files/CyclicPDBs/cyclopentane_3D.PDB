@@ -1,0 +1,32 @@
+COMPND  cyclopentane_02.PDB                                                     
+HETATM    1  C                  -0.658  -1.155   0.322                
+HETATM    2  C                   0.822  -1.167  -0.083                
+HETATM    3  C                   1.255   0.300   0.070                
+HETATM    4  C                  -0.027   1.140  -0.095                
+HETATM    5  C                  -1.163   0.134  -0.338                
+HETATM   14  H                  -0.748  -1.076   1.431                
+HETATM   15  H                  -1.208  -2.062  -0.020                
+HETATM   12  H                   0.908  -1.476  -1.153                
+HETATM   13  H                   1.431  -1.867   0.532                
+HETATM    8  H                   2.037   0.573  -0.675                
+HETATM    9  H                   1.684   0.460   1.088                
+HETATM    6  H                   0.053   1.873  -0.931                
+HETATM    7  H                  -0.227   1.713   0.842                
+HETATM   10  H                  -2.141   0.474   0.074                
+HETATM   11  H                  -1.287  -0.038  -1.435                
+CONECT    1    2    5   14   15                              
+CONECT    2    1    3   12   13                              
+CONECT    3    2    4    8    9                              
+CONECT    4    3    5    6    7                              
+CONECT    5    1    4   10   11                              
+CONECT   14    1                                             
+CONECT   15    1                                             
+CONECT   12    2                                             
+CONECT   13    2                                             
+CONECT    8    3                                             
+CONECT    9    3                                             
+CONECT    6    4                                             
+CONECT    7    4                                             
+CONECT   10    5                                             
+CONECT   11    5                                             
+END   
