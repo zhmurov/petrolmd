@@ -10,6 +10,7 @@ The following will create initial coordinates for alkanes, build the topologies 
         mkdir toppar
         cd toppar
         ${PETROLMD}/build/CreateAlkanesCHARMM/create_alkanes_charmm
-        ${PETROLMD}/CreateAlkanesCHARMM/create_topologies.sh
-        ${PETROLMD}/CreateAlkanesCHARMM/minimize.sh
+        bash ${PETROLMD}/CreateAlkanesCHARMM/create_topologies.sh
+        bash ${PETROLMD}/CreateAlkanesCHARMM/minimize.sh
 
+This will produce two folders: coord, with minimized coordinates in gro and pdb formats and toppar with itp files for the molecules.
