@@ -7,7 +7,7 @@ mkdir coord
 mkdir toppar
 
 # Copy the energy minimization script
-cp ${PETROLMD}/CreateAlkanesCHARMM/files/em.mdp .
+cp ${PETROLMD}/files/em_vac.mdp em.mdp
 # Generate PDBs for alkanes
 ${PETROLMD}/build/CreateAlkanesCHARMM/create_alkanes_charmm
 # Copy oter PDBs
