@@ -5,10 +5,10 @@
 
 #include "pdbio.h"
 
-#define CC_BOND_DISTANCE 1.540
+#define CC_BOND_DISTANCE 1.530
 #define CCC_BOND_ANGLE   114.0
-#define CH_BOND_DISTANCE 1.0
-#define HCH_BOND_ANGLE   110.0
+#define CH_BOND_DISTANCE 1.111
+#define HCH_BOND_ANGLE   109.0
 #define MAX_ATOM_COUNT   100
 
 #define CH_BOND_DISTANCE_METHANE 1.087
