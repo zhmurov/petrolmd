@@ -269,7 +269,7 @@ At this stage, we need to manually edit the configuration file for packmol to se
     .. code-block:: shell
 
         $PACKMOL < ${SYSTEM_NAME}_packmol.inp
-        cp ${PETROLMD}/files/*.mdp .
+        cp ${PETROLMD}/files/mdp-trappeua/*.mdp .
         $GMX editconf -f ${SYSTEM_NAME}.pdb -o ${SYSTEM_NAME}_box.gro -box ${Lx} ${Ly} ${Lz} -noc
         $GMX solvate -cp ${SYSTEM_NAME}_box.gro -cs toppar/tip4p.gro -o ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top -maxsol 60000
         
