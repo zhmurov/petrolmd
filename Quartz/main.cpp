@@ -1,27 +1,49 @@
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <string>
+#include <sstream>
 #include <iostream>
+#include <vector>
 
 #include "xyzio.h"
+#include "psfio.h"
+#include "pdbio.h"
 
-#define NX 2
-#define NY 2 
+#define NX 14
+#define NY 20 
 
-struct Atom {
+struct Atom
+{
     std::string name;
     std::string type;
     float charge;
+    int cgr;
     float x, y, z;
+    int ix;
+    int iy;
 };
+
+struct Bond
+{
+    std::string name1;
+    std::string name2;
+};
+
+std::map<std::string, int> atomNameToIdx;
+
+std::string convertName(std::string name, int ix, int iy)
+{
+    return name + "_" + std::to_string(ix) + "_" + std::to_string(iy);
+}
 
 int main(int argc, char *argv[])
 {
     XYZ xyzIn;
-    readXYZ("Quartz/files/input.xyz", &xyzIn);
+    readXYZ("/home/zhmurov/git/artemzhmurov/petrolmd/Quartz/files/input.xyz", &xyzIn);
     
     std::ifstream ucFile;
-    ucFile.open("Quartz/files/crystal.dat");
+    ucFile.open("/home/zhmurov/git/artemzhmurov/petrolmd/Quartz/files/crystal.dat");
 
     float a, b, c, alpha, beta, gamma;
 
@@ -34,15 +56,16 @@ int main(int argc, char *argv[])
 
     std::cout << a << "  " << b << "  " << c << "  " << alpha << "  " << beta << "  " << gamma << std::endl;
 
-    ucFile.close();
+    std::cout << "Recommended x - y box size is " << a*NX << " - " << b*NY << std::endl;
 
+    ucFile.close();
 
     XYZ xyzOut;
     xyzOut.atomCount = xyzIn.atomCount*NX*NY;
     xyzOut.atoms = (XYZAtom*)calloc(xyzOut.atomCount, sizeof(XYZAtom));
-    for (int ix = 0; ix < NX; ix ++)
+    for (int iy = 0; iy < NY; iy ++)
     {
-        for (int iy = 0; iy < NY; iy ++)
+        for (int ix = 0; ix < NX; ix ++)
         {
             for (int i = 0; i < xyzIn.atomCount; i++)
             {
@@ -59,118 +82,207 @@ int main(int argc, char *argv[])
             }
         }
     }
-    writeXYZ("Quartz/files/slab.xyz", &xyzOut);
+    writeXYZ("slab.xyz", &xyzOut);
 
-    std::ofstream rtpFile;
-    rtpFile.open("Quartz/files/sioslab.rtp");
+    std::vector<Atom> atomsIn;
+    std::vector<Bond> bondsIn;
 
-    rtpFile << "[ bondedtypes ]" << std::endl;
-    rtpFile << "; Col 1: Type of bond " << std::endl;
-    rtpFile << "; Col 2: Type of angles " << std::endl;
-    rtpFile << "; Col 3: Type of proper dihedrals " << std::endl;
-    rtpFile << "; Col 4: Type of improper dihedrals " << std::endl;
-    rtpFile << "; Col 5: Generate all dihedrals if 1, only heavy atoms of 0. " << std::endl;
-    rtpFile << "; Col 6: Number of excluded neighbors for nonbonded interactions " << std::endl;
-    rtpFile << "; Col 7: Generate 1,4 interactions between pairs of hydrogens if 1 " << std::endl;
-    rtpFile << "; Col 8: Remove propers over the same bond as an improper if it is 1 " << std::endl;
-    rtpFile << "; bonds  angles  dihedrals  impropers  all_dihedrals  nrexcl  HH14  RemoveDih " << std::endl;
-    rtpFile << "1       5        9          2            1           3      1       0" << std::endl;
+    std::fstream rtpInStream;
+    rtpInStream.open("/home/zhmurov/git/artemzhmurov/charmm36/charmm36.ff/silicates.rtp");
 
-    rtpFile << "[ SiO_" << NX << "_" << NY << " ]" << std::endl;
-    rtpFile << "; " << std::endl;
-    rtpFile << "[ atoms ]" << std::endl;
-    for (int ix = 0; ix < NX; ix ++)
+    std::string line;
+    while (std::getline(rtpInStream, line) && line.compare("[ Q011 ]") != 0)
     {
-        for (int iy = 0; iy < NY; iy ++)
+        
+    }
+    while (std::getline(rtpInStream, line) && line.compare("  [ atoms ]") != 0)
+    {
+    }
+    while (std::getline(rtpInStream, line) && line.compare("  [ bonds ]") != 0)
+    {
+        //std::cout << line << std::endl;
+        std::stringstream lineStream(line); 
+        Atom atom;
+        lineStream >> atom.name >> atom.type >> atom.charge >> atom.cgr;
+        atomsIn.push_back(atom);
+
+    }
+    while (std::getline(rtpInStream, line) && !line.empty())
+    {
+        //std::cout << line << std::endl;
+        std::stringstream lineStream(line); 
+        Bond bond;
+        lineStream >> bond.name1 >> bond.name2;
+        bondsIn.push_back(bond);
+    }
+    rtpInStream.close();
+
+    std::cout << "Atoms:" << std::endl;
+    for (auto atom : atomsIn)
+    {
+        std::cout << atom.name << " " << atom.type << " " << atom.charge << " " << atom.cgr << std::endl;
+    }
+    
+    std::cout << "Bonds:" << std::endl;
+    for (auto bond : bondsIn)
+    {
+        std::cout << bond.name1 << " " << bond.name2 << std::endl;
+    }
+
+    std::vector<Atom> atomsOut;
+    std::vector<Bond> bondsOut;
+
+    int idx = 0;
+
+    for (int iy = 0; iy < NY; iy ++)
+    {
+        for (int ix = 0; ix < NX; ix ++)
         {
-            rtpFile << "  SI" << ix << iy << "1     SIH3  0.8000   0" << std::endl;
-            rtpFile << "  SI" << ix << iy << "2       SI  1.0800   0" << std::endl;
-            rtpFile << "  SI" << ix << iy << "3       SI  1.0800   0" << std::endl;
-            rtpFile << "  SI" << ix << iy << "4       SI  1.0800   0" << std::endl;
-            rtpFile << "   O" << ix << iy << "5     OSIE -0.5300   0" << std::endl;
-            rtpFile << "   O" << ix << iy << "6     OSIE -0.5300   0" << std::endl;
-            rtpFile << "   O" << ix << iy << "7     OSIE -0.5300   0" << std::endl;
-            rtpFile << "   O" << ix << iy << "8     OSIE -0.5300   0" << std::endl;
-            rtpFile << "   O" << ix << iy << "9     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "10     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "11     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "12     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "13     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "14     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "15     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "16     OSIH -0.5400   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "17     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "18     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "19     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "20     OSIE -0.5300   0" << std::endl;
-            rtpFile << " SI" << ix << iy << "21       SI  1.0800   0" << std::endl;
-            rtpFile << " SI" << ix << iy << "22       SI  1.0800   0" << std::endl;
-            rtpFile << " SI" << ix << iy << "23       SI  1.0800   0" << std::endl;
-            rtpFile << " SI" << ix << iy << "24       SI  1.0800   0" << std::endl;
-            rtpFile << " SI" << ix << iy << "25     SIH3  0.8000   0" << std::endl;
-            rtpFile << " SI" << ix << iy << "26       SI  1.0800   0" << std::endl;
-            rtpFile << " SI" << ix << iy << "27       SI  1.0800   0" << std::endl;
-            rtpFile << " SI" << ix << iy << "28       SI  1.0800   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "29     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "30     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "31     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "32     OSIH -0.5400   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "33     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "34     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "35     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  O" << ix << iy << "36     OSIE -0.5300   0" << std::endl;
-            rtpFile << "  H" << ix << iy << "37     HSIA -0.1500   0" << std::endl;
-            rtpFile << "  H" << ix << iy << "38     HSIO  0.3200   0" << std::endl;
-            rtpFile << "  H" << ix << iy << "39     HSIA -0.1500   0" << std::endl;
-            rtpFile << "  H" << ix << iy << "40     HSIO  0.3200   0" << std::endl;
+            for (auto atomIn : atomsIn)
+            {
+                Atom atomOut;
+                atomOut.name = convertName(atomIn.name, ix, iy);
+                atomOut.type = atomIn.type;
+                atomOut.charge = atomIn.charge;
+                atomOut.cgr = atomIn.cgr;
+                atomOut.ix = ix;
+                atomOut.iy = iy;
+                atomsOut.push_back(atomOut);
+                atomNameToIdx.insert({atomOut.name, idx});
+                idx++;
+            }
         }
     }
-    rtpFile << "[ bonds ]" << std::endl;
-    for (int ix = 0; ix < NX; ix ++)
+    for (int iy = 0; iy < NY; iy ++)
     {
-        for (int iy = 0; iy < NY; iy ++)
+        for (int ix = 0; ix < NX; ix ++)
         {
-            rtpFile << "   O" << ix << iy << "5   SI" << ix << iy << "1" << std::endl;
-            rtpFile << "   O" << ix << iy << "9   SI" << ix << iy << "1" << std::endl;
-            rtpFile << "  H" << ix << iy << "37   SI" << ix << iy << "1" << std::endl;
-            rtpFile << "   O" << ix << iy << "6   SI" << ix << iy << "2" << std::endl;
-            rtpFile << "  O" << ix << iy << "10   SI" << ix << iy << "2" << std::endl;
-            rtpFile << "  O" << ix << iy << "13   SI" << ix << iy << "2" << std::endl;
-            rtpFile << "  O" << ix << iy << "18   SI" << ix << iy << "2" << std::endl;
-            rtpFile << "   O" << ix << iy << "7   SI" << ix << iy << "3" << std::endl;
-            rtpFile << "  O" << ix << iy << "11   SI" << ix << iy << "3" << std::endl;
-            rtpFile << "  O" << ix << iy << "14   SI" << ix << iy << "3" << std::endl;
-            rtpFile << "  O" << ix << iy << "19   SI" << ix << iy << "3" << std::endl;
-            rtpFile << "  O" << ix << iy << "15   SI" << ix << iy << "4" << std::endl;
-            rtpFile << "  O" << ix << iy << "20   SI" << ix << iy << "4" << std::endl;
-            rtpFile << " SI" << ix << iy << "21    O" << ix << iy << "5" << std::endl;
-            rtpFile << " SI" << ix << iy << "24    O" << ix << iy << "8" << std::endl;
-            rtpFile << " SI" << ix << iy << "26   O" << ix << iy << "10" << std::endl;
-            rtpFile << " SI" << ix << iy << "27   O" << ix << iy << "11" << std::endl;
-            rtpFile << " SI" << ix << iy << "28   O" << ix << iy << "12" << std::endl;
-            rtpFile << " SI" << ix << iy << "25   O" << ix << iy << "13" << std::endl;
-            rtpFile << " SI" << ix << iy << "26   O" << ix << iy << "14" << std::endl;
-            rtpFile << " SI" << ix << iy << "27   O" << ix << iy << "15" << std::endl;
-            rtpFile << " SI" << ix << iy << "28   O" << ix << iy << "16" << std::endl;
-            rtpFile << " SI" << ix << iy << "21   O" << ix << iy << "17" << std::endl;
-            rtpFile << " SI" << ix << iy << "23   O" << ix << iy << "19" << std::endl;
-            rtpFile << " SI" << ix << iy << "24   O" << ix << iy << "20" << std::endl;
-            rtpFile << "  O" << ix << iy << "29  SI" << ix << iy << "21" << std::endl;
-            rtpFile << "  O" << ix << iy << "33  SI" << ix << iy << "21" << std::endl;
-            rtpFile << "  O" << ix << iy << "30  SI" << ix << iy << "22" << std::endl;
-            rtpFile << "  O" << ix << iy << "34  SI" << ix << iy << "22" << std::endl;
-            rtpFile << "  O" << ix << iy << "31  SI" << ix << iy << "23" << std::endl;
-            rtpFile << "  O" << ix << iy << "35  SI" << ix << iy << "23" << std::endl;
-            rtpFile << "  O" << ix << iy << "32  SI" << ix << iy << "24" << std::endl;
-            rtpFile << "  O" << ix << iy << "36  SI" << ix << iy << "24" << std::endl;
-            rtpFile << "  H" << ix << iy << "39  SI" << ix << iy << "25" << std::endl;
-            rtpFile << "  O" << ix << iy << "29  SI" << ix << iy << "26" << std::endl;
-            rtpFile << "  O" << ix << iy << "34  SI" << ix << iy << "26" << std::endl;
-            rtpFile << "  O" << ix << iy << "36  SI" << ix << iy << "28" << std::endl;
-            rtpFile << "  H" << ix << iy << "40   O" << ix << iy << "32" << std::endl;
-            rtpFile << "  O" << ix << iy << "16   H" << ix << iy << "38" << std::endl;
+            for (auto bondIn : bondsIn)
+            {
+                Bond bondOut;
+                bondOut.name1 = convertName(bondIn.name1, ix, iy);
+                bondOut.name2 = convertName(bondIn.name2, ix, iy);
+                bondsOut.push_back(bondOut);
+            }
+            //if (ix > 0)
+            {
+                int ixm1 = (ix > 0) ? ix-1 : NX-1;
+                Bond bond1;
+                bond1.name1 = convertName("SI4", ixm1, iy);
+                bond1.name2 = convertName("O12", ix, iy);
+                bondsOut.push_back(bond1);
+
+                Bond bond2;
+                bond2.name1 = convertName("SI27", ixm1, iy);
+                bond2.name2 = convertName("O35", ix, iy);
+                bondsOut.push_back(bond2);
+
+                Bond bond3;
+                bond3.name1 = convertName("SI22", ixm1, iy);
+                bond3.name2 = convertName("O18", ix, iy);
+                bondsOut.push_back(bond3);
+
+                Bond bond4;
+                bond4.name1 = convertName("O9", ixm1, iy);
+                bond4.name2 = convertName("SI25", ix, iy);
+                bondsOut.push_back(bond4);
+            }
+            //if (iy > 0)
+            {
+                int iym1 = (iy > 0) ? iy-1 : NY-1 ;
+                Bond bond1;
+                bond1.name1 = convertName("SI1", ix, iym1);
+                bond1.name2 = convertName("O17", ix, iy);
+                bondsOut.push_back(bond1);
+
+                Bond bond2;
+                bond2.name1 = convertName("O30", ix, iym1);
+                bond2.name2 = convertName("SI27", ix, iy);
+                bondsOut.push_back(bond2);
+
+                Bond bond3;
+                bond3.name1 = convertName("O31", ix, iym1);
+                bond3.name2 = convertName("SI28", ix, iy);
+                bondsOut.push_back(bond3);
+
+                Bond bond4;
+                bond4.name1 = convertName("SI23", ix, iym1);
+                bond4.name2 = convertName("O7", ix, iy);
+                bondsOut.push_back(bond4);
+            }
         }
     }
-    rtpFile.close();
 
+    for (int i = 0; i < xyzOut.atomCount; i++)
+    {
+        atomsOut[i].x = xyzOut.atoms[i].x;
+        atomsOut[i].y = xyzOut.atoms[i].y;
+        atomsOut[i].z = xyzOut.atoms[i].z;
+    }
+
+    std::ofstream rtpOutFile;
+    rtpOutFile.open("slab.rtp");
+
+    rtpOutFile << "[ bondedtypes ]" << std::endl;
+    rtpOutFile << "; bonds  angles  dihedrals  impropers  all_dihedrals  nrexcl  HH14  RemoveDih " << std::endl;
+    rtpOutFile << "1       5        9          2            1           3      1       0" << std::endl;
+
+    rtpOutFile << "[ SiO_" << NX << "_" << NY << " ]" << std::endl;
+    rtpOutFile << "; " << std::endl;
+    rtpOutFile << "[ atoms ]" << std::endl;
+    for (auto atomOut : atomsOut)
+    {
+        //rtpOutFile << "  " << atomOut.name << "     " << atomOut.type << " " << atomOut.charge << "   " << atomOut.cgr << std::endl;
+        rtpOutFile << "  " << atomNameToIdx[atomOut.name] << "     " << atomOut.type << " " << atomOut.charge << "   " << atomOut.cgr << std::endl;
+    }
+    rtpOutFile << "[ bonds ]" << std::endl;
+    for (auto bondOut : bondsOut)
+    {
+        //rtpOutFile << "   " << bondOut.name1 << "   " << bondOut.name2 << std::endl;
+        rtpOutFile << "   " << atomNameToIdx[bondOut.name1] << "   " << atomNameToIdx[bondOut.name2] << std::endl;
+    }
+    rtpOutFile.close();
+
+    PSF psfOut;
+    psfOut.natom = atomsOut.size();
+    psfOut.nbond = bondsOut.size();
+    psfOut.ntheta = 0;
+    psfOut.nphi = 0;
+    psfOut.nimphi = 0;
+    psfOut.ncmap = 0;
+    psfOut.nnb = 0;
+
+    psfOut.atoms = (PSFAtom*)calloc(psfOut.natom, sizeof(PSFAtom));
+    psfOut.bonds = (PSFBond*)calloc(psfOut.nbond, sizeof(PSFBond));
+
+    idx = 0;
+    for (auto atomOut : atomsOut)
+    {
+        PSFAtom atom;
+        atom.id = atomNameToIdx[atomOut.name] + 1;
+        sprintf(atom.name, "%3s ", atomOut.name.substr(0, 3).c_str());
+        sprintf(atom.type, "%s", atomOut.type.c_str());
+        atom.q = atomOut.charge;
+        
+        atom.resid = 1 + atomOut.ix + NX*atomOut.iy;
+        sprintf(atom.resName, "SiO2");
+        sprintf(atom.segment, "SiO2");
+        atom.m = 1.0;
+        psfOut.atoms[idx] = atom;
+        idx ++;
+    }
+    idx = 0;
+    for (auto bondOut : bondsOut)
+    {
+        PSFBond bond;
+        bond.i = atomNameToIdx[bondOut.name1] + 1;
+        bond.j = atomNameToIdx[bondOut.name2] + 1;
+        psfOut.bonds[idx] = bond;
+        idx ++;
+    }
+    writePSF("slab.psf", &psfOut);
+
+    std::ofstream topOutFile;
+    topOutFile.open("slab.top");
+    
 }
