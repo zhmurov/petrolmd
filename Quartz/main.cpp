@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <sstream>
+#include <iomanip>
 #include <iostream>
 #include <vector>
 
@@ -10,8 +11,8 @@
 #include "psfio.h"
 #include "pdbio.h"
 
-#define NX 14
-#define NY 20 
+#define NX 2
+#define NY 2 
 
 struct Atom
 {
@@ -31,6 +32,13 @@ struct Bond
 };
 
 std::map<std::string, int> atomNameToIdx;
+
+std::string nameToShortName(std::string name)
+{
+    std::stringstream stream;
+    stream << std::hex << std::setfill('0') << std::setw(3) << atomNameToIdx[name];
+    return stream.str();
+}
 
 std::string convertName(std::string name, int ix, int iy)
 {
@@ -227,19 +235,20 @@ int main(int argc, char *argv[])
     rtpOutFile << "; bonds  angles  dihedrals  impropers  all_dihedrals  nrexcl  HH14  RemoveDih " << std::endl;
     rtpOutFile << "1       5        9          2            1           3      1       0" << std::endl;
 
-    rtpOutFile << "[ SiO_" << NX << "_" << NY << " ]" << std::endl;
+    //rtpOutFile << "[ SiO_" << NX << "_" << NY << " ]" << std::endl;
+    rtpOutFile << "[ SiO ]" << std::endl;
     rtpOutFile << "; " << std::endl;
     rtpOutFile << "[ atoms ]" << std::endl;
     for (auto atomOut : atomsOut)
     {
         //rtpOutFile << "  " << atomOut.name << "     " << atomOut.type << " " << atomOut.charge << "   " << atomOut.cgr << std::endl;
-        rtpOutFile << "  " << atomNameToIdx[atomOut.name] << "     " << atomOut.type << " " << atomOut.charge << "   " << atomOut.cgr << std::endl;
+        rtpOutFile << "  " << nameToShortName(atomOut.name) << "     " << atomOut.type << " " << atomOut.charge << "   " << atomOut.cgr << std::endl;
     }
     rtpOutFile << "[ bonds ]" << std::endl;
     for (auto bondOut : bondsOut)
     {
         //rtpOutFile << "   " << bondOut.name1 << "   " << bondOut.name2 << std::endl;
-        rtpOutFile << "   " << atomNameToIdx[bondOut.name1] << "   " << atomNameToIdx[bondOut.name2] << std::endl;
+        rtpOutFile << "   " << nameToShortName(bondOut.name1) << "   " << nameToShortName(bondOut.name2) << std::endl;
     }
     rtpOutFile.close();
 
@@ -282,7 +291,28 @@ int main(int argc, char *argv[])
     }
     writePSF("slab.psf", &psfOut);
 
-    std::ofstream topOutFile;
-    topOutFile.open("slab.top");
-    
+    PDB pdbOut;
+    pdbOut.atomCount = atomsOut.size();
+    pdbOut.atoms = (PDBAtom*)calloc(pdbOut.atomCount, sizeof(PDBAtom));
+    pdbOut.ssCount = 0;
+    pdbOut.symmetryCount = 0;
+    pdbOut.matrixCount = 0;
+    idx = 0;
+    for (auto atomOut : atomsOut)
+    {
+        pdbOut.atoms[idx].id = idx + 1;
+        sprintf(pdbOut.atoms[idx].name, "%s", nameToShortName(atomOut.name).c_str());
+        pdbOut.atoms[idx].chain = 'A';
+        sprintf(pdbOut.atoms[idx].resName, "SiO");
+        pdbOut.atoms[idx].altLoc = ' ';
+        pdbOut.atoms[idx].resid = 1;
+        pdbOut.atoms[idx].x = atomOut.x;
+        pdbOut.atoms[idx].y = atomOut.y;
+        pdbOut.atoms[idx].z = atomOut.z;
+        sprintf(pdbOut.atoms[idx].segment, "A");
+        pdbOut.atoms[idx].occupancy = 0.0;
+        pdbOut.atoms[idx].beta = 0.0;
+        idx ++;
+    }
+    writePDB("slab.pdb", &pdbOut);
 }
