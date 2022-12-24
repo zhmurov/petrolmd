@@ -72,17 +72,17 @@ std::map<std::string, int> atomCounts = {
     {"CL", 1}
 };
 
-struct MoleculeType
+struct MolType
 {
     std::string name;
     int atomCount = 0;
     int count;
 };
 
-std::vector<MoleculeType> moleculeTypes;
+std::vector<MolType> molTypes;
 int totMoleculesCount;
 
-void readMoleculeTypes(std::string filename)
+void readMolTypes(std::string filename)
 {
     std::fstream stream;
     stream.open(filename);
@@ -100,20 +100,20 @@ void readMoleculeTypes(std::string filename)
     {
         std::cout << line << std::endl;
         std::stringstream lineStream(line); 
-        MoleculeType moleculeType;
-        lineStream >> moleculeType.name >> moleculeType.count;
-        moleculeType.atomCount = atomCounts[moleculeType.name];
-        moleculeTypes.push_back(moleculeType);
+        MolType molType;
+        lineStream >> molType.name >> molType.count;
+        molType.atomCount = atomCounts[molType.name];
+        molTypes.push_back(molType);
 
-        totAtomCount += moleculeType.count*moleculeType.atomCount;
-        totMoleculesCount += moleculeType.count;
+        totAtomCount += molType.count*molType.atomCount;
+        totMoleculesCount += molType.count;
     }
     stream.close();
 
     std::cout << "Molecules read:" << std::endl;
-    for (auto moleculeType : moleculeTypes)
+    for (auto molType : molTypes)
     {
-        std::cout << moleculeType.name << " " << moleculeType.count << "  " << moleculeType.atomCount << " atoms each" << std::endl;
+        std::cout << molType.name << " " << molType.count << "  " << molType.atomCount << " atoms each" << std::endl;
     }
     std::cout << "Total number of atoms: " << totAtomCount << std::endl;
 }
@@ -123,22 +123,22 @@ std::vector<chemfiles::Vector3D> computeCOMs(chemfiles::span<chemfiles::Vector3D
     std::vector<chemfiles::Vector3D> coms = std::vector<chemfiles::Vector3D>(totMoleculesCount, {0.0, 0.0, 0.0});
     int molid = 0;
     int firstAtom = 0;
-    for (auto moleculeType : moleculeTypes)
+    for (auto molType : molTypes)
     {
-        for (int molnum = 0; molnum < moleculeType.count; molnum++)
+        for (int molnum = 0; molnum < molType.count; molnum++)
         {
             chemfiles::Vector3D com = {0.0, 0.0, 0.0};
-            for (int atomid = 0; atomid < moleculeType.atomCount; atomid++)
+            for (int atomid = 0; atomid < molType.atomCount; atomid++)
             {
                 com = com + positions[firstAtom + atomid];
             }
-            com[0] /= moleculeType.atomCount;
-            com[1] /= moleculeType.atomCount;
-            com[2] /= moleculeType.atomCount;
+            com[0] /= molType.atomCount;
+            com[1] /= molType.atomCount;
+            com[2] /= molType.atomCount;
             assert(molid < totMoleculesCount);
             coms[molid] = com;
             molid ++;
-            firstAtom += moleculeType.atomCount;
+            firstAtom += molType.atomCount;
         }
     }
     return coms;
@@ -151,10 +151,10 @@ int main() {
     nbin[1] = NBINY;
     nbin[2] = NBINZ;
 
-    readMoleculeTypes("/home/zhmurov/Data/Sirius/PetrolMD/25-charmm-yamburg/yamburg_recomb.top");
+    readMolTypes("/home/zhmurov/Data/Sirius/PetrolMD/28-yamburg-nogas/yamburg_recomb.top");
 
-    chemfiles::Trajectory mds("/home/zhmurov/Data/Sirius/PetrolMD/25-charmm-yamburg/md_iso.xtc");
-    mds.set_topology("/home/zhmurov/Data/Sirius/PetrolMD/25-charmm-yamburg/md_iso.tpr");
+    chemfiles::Trajectory mds("/home/zhmurov/Data/Sirius/PetrolMD/28-yamburg-nogas/md_iso.xtc");
+    mds.set_topology("/home/zhmurov/Data/Sirius/PetrolMD/28-yamburg-nogas/md_iso.tpr");
 
     //chemfiles::Trajectory mds("/home/zhmurov/Sirius/5-charmm/md_iso.xtc");
     //mds.set_topology("/home/zhmurov/Sirius/5-charmm/md_iso.tpr");
@@ -188,7 +188,7 @@ int main() {
     auto frame = mds.read();
     
     std::vector<chemfiles::Vector3D> oldcoms = std::vector<chemfiles::Vector3D>(totMoleculesCount, {0.0, 0.0, 0.0});
-    std::vector<double> dr2s = std::vector<double>(moleculeTypes.size(), 0.0);
+    std::vector<double> dr2s = std::vector<double>(molTypes.size(), 0.0);
     /*std::vector<double> dr2_liquid = std::vector<double>(frame.size(), 0.0);
     std::vector<double> dr2_gas = std::vector<double>(frame.size(), 0.0);
     std::vector<int> ndr2_liquid = std::vector<int>(frame.size(), 0);
@@ -196,17 +196,17 @@ int main() {
 
     std::cout << "Atom count: " << frame.size() << std::endl;
 
-    for (auto atom : frame.topology())
+    /*for (auto atom : frame.topology())
     {
         
-        /*std::cout << atom.name() << ": ";
+        std::cout << atom.name() << ": ";
         for (auto prop : atom.properties().value())
         {
             std::cout << prop.first << "  " << prop.second.as_string();
         }
-        std::cout << std::endl;*/
+        std::cout << std::endl;
 
-    }
+    }*/
 
     for (size_t step = 1; step < mds.nsteps(); step++)
     {
@@ -257,17 +257,24 @@ int main() {
         std::vector<chemfiles::Vector3D> coms = computeCOMs(frame.positions());
 
         int molid = 0;
-        int moleculeTypeId = 0;
-        for (auto moleculeType : moleculeTypes)
+        int molTypeId = 0;
+        for (auto molType : molTypes)
         {
-            for (int molnum = 0; molnum < moleculeType.count; molnum++)
+            for (int molnum = 0; molnum < molType.count; molnum++)
             {
                 chemfiles::Vector3D dr = coms[molid] - oldcoms[molid];
+                for (int d = 0; d < 3; d++)
+                {
+                    if (dr[d] > ucl[d])
+                    {
+                        dr[d] -= ucl[d];
+                    }
+                }
                 double dr2 = dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2];
-                dr2s[moleculeTypeId] += dr2;
+                dr2s[molTypeId] += dr2;
                 molid ++;
             }
-            moleculeTypeId++;
+            molTypeId++;
         }
 
         std::copy(coms.begin(), coms.end(), std::back_inserter(oldcoms));
@@ -313,15 +320,15 @@ int main() {
         std::fill(hist.begin(), hist.end(), 0.0);
     }
 
-    int moleculeTypeId = 0;
-    for (auto moleculeType : moleculeTypes)
+    int molTypeId = 0;
+    for (auto molType : molTypes)
     {
-        dr2s[moleculeTypeId] /= moleculeType.count;
-        dr2s[moleculeTypeId] /= mds.nsteps();
+        dr2s[molTypeId] /= molType.count;
+        dr2s[molTypeId] /= mds.nsteps();
 
-        std::cout << moleculeType.name << ": " << dr2s[moleculeTypeId] << std::endl;
+        std::cout << molType.name << ": " << dr2s[molTypeId] << std::endl;
 
-        moleculeTypeId++;
+        molTypeId++;
     }
 
     /*std::ofstream out;
