@@ -37,7 +37,7 @@ for filename in *.pdb; do
     
     # Move molecule so that all coordinates are positive
     $GMX editconf -f ${name}.pdb -o ${name}.gro -d 0.1
-    # Create lare simulation box (~no PBC simulations)
+    # Create large simulation box (~no PBC simulations)
     $GMX editconf -f ${name}.gro -o ${name}.gro -box 100 100 100 -noc
     # Configure and run GROMACS
     $GMX grompp -f em.mdp -c ${name}.gro -p ${name}.top -o ${name}_em.tpr
