@@ -1,0 +1,13 @@
+; Include forcefield parameters
+#include "charmm36.ff/forcefield.itp"
+#include "charmm36.ff/tip3p.itp"
+#include "charmm36.ff/ions.itp"
+#include "toppar/SiO2_2x2.itp"
+
+[ system ]
+; Name
+sislab in water
+
+[ molecules ]
+; Compound     #mols
+SiO2_2x2      1
