@@ -12,10 +12,11 @@
 #include "pdbio.h"
 
 #define NX 2
-#define NY 2 
+#define NY 2
 
 struct Atom
 {
+    std::string oldName;
     std::string name;
     std::string type;
     float charge;
@@ -99,7 +100,7 @@ int main(int argc, char *argv[])
     rtpInStream.open("/home/zhmurov/git/artemzhmurov/charmm36/charmm36.ff/silicates.rtp");
 
     std::string line;
-    while (std::getline(rtpInStream, line) && line.compare("[ Q011 ]") != 0)
+    while (std::getline(rtpInStream, line) && line.compare("[ SiO ]") != 0)
     {
         
     }
@@ -149,6 +150,7 @@ int main(int argc, char *argv[])
             for (auto atomIn : atomsIn)
             {
                 Atom atomOut;
+                atomOut.oldName = atomIn.name;
                 atomOut.name = convertName(atomIn.name, ix, iy);
                 atomOut.type = atomIn.type;
                 atomOut.charge = atomIn.charge;
@@ -301,11 +303,12 @@ int main(int argc, char *argv[])
     for (auto atomOut : atomsOut)
     {
         pdbOut.atoms[idx].id = idx + 1;
-        sprintf(pdbOut.atoms[idx].name, "%s", nameToShortName(atomOut.name).c_str());
+        //sprintf(pdbOut.atoms[idx].name, "%s", nameToShortName(atomOut.name).c_str());
+        sprintf(pdbOut.atoms[idx].name, "%s", atomOut.oldName.c_str());
         pdbOut.atoms[idx].chain = 'A';
         sprintf(pdbOut.atoms[idx].resName, "SiO");
         pdbOut.atoms[idx].altLoc = ' ';
-        pdbOut.atoms[idx].resid = 1;
+        pdbOut.atoms[idx].resid = atomOut.ix + NX*atomOut.iy;
         pdbOut.atoms[idx].x = atomOut.x;
         pdbOut.atoms[idx].y = atomOut.y;
         pdbOut.atoms[idx].z = atomOut.z;
