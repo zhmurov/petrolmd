@@ -16,7 +16,6 @@
 
 struct Atom
 {
-    std::string oldName;
     std::string name;
     std::string type;
     float charge;
@@ -25,26 +24,6 @@ struct Atom
     int ix;
     int iy;
 };
-
-struct Bond
-{
-    std::string name1;
-    std::string name2;
-};
-
-std::map<std::string, int> atomNameToIdx;
-
-std::string nameToShortName(std::string name)
-{
-    std::stringstream stream;
-    stream << std::hex << std::setfill('0') << std::setw(3) << atomNameToIdx[name];
-    return stream.str();
-}
-
-std::string convertName(std::string name, int ix, int iy)
-{
-    return name + "_" + std::to_string(ix) + "_" + std::to_string(iy);
-}
 
 int main(int argc, char *argv[])
 {
@@ -94,7 +73,6 @@ int main(int argc, char *argv[])
     writeXYZ("slab.xyz", &xyzOut);
 
     std::vector<Atom> atomsIn;
-    std::vector<Bond> bondsIn;
 
     std::fstream rtpInStream;
     rtpInStream.open("/home/zhmurov/git/artemzhmurov/charmm36/charmm36.ff/silicates.rtp");
@@ -116,14 +94,6 @@ int main(int argc, char *argv[])
         atomsIn.push_back(atom);
 
     }
-    while (std::getline(rtpInStream, line) && !line.empty())
-    {
-        //std::cout << line << std::endl;
-        std::stringstream lineStream(line); 
-        Bond bond;
-        lineStream >> bond.name1 >> bond.name2;
-        bondsIn.push_back(bond);
-    }
     rtpInStream.close();
 
     std::cout << "Atoms:" << std::endl;
@@ -132,14 +102,7 @@ int main(int argc, char *argv[])
         std::cout << atom.name << " " << atom.type << " " << atom.charge << " " << atom.cgr << std::endl;
     }
     
-    std::cout << "Bonds:" << std::endl;
-    for (auto bond : bondsIn)
-    {
-        std::cout << bond.name1 << " " << bond.name2 << std::endl;
-    }
-
     std::vector<Atom> atomsOut;
-    std::vector<Bond> bondsOut;
 
     int idx = 0;
 
@@ -150,75 +113,14 @@ int main(int argc, char *argv[])
             for (auto atomIn : atomsIn)
             {
                 Atom atomOut;
-                atomOut.oldName = atomIn.name;
-                atomOut.name = convertName(atomIn.name, ix, iy);
+                atomOut.name = atomIn.name;
                 atomOut.type = atomIn.type;
                 atomOut.charge = atomIn.charge;
                 atomOut.cgr = atomIn.cgr;
                 atomOut.ix = ix;
                 atomOut.iy = iy;
                 atomsOut.push_back(atomOut);
-                atomNameToIdx.insert({atomOut.name, idx});
                 idx++;
-            }
-        }
-    }
-    for (int iy = 0; iy < NY; iy ++)
-    {
-        for (int ix = 0; ix < NX; ix ++)
-        {
-            for (auto bondIn : bondsIn)
-            {
-                Bond bondOut;
-                bondOut.name1 = convertName(bondIn.name1, ix, iy);
-                bondOut.name2 = convertName(bondIn.name2, ix, iy);
-                bondsOut.push_back(bondOut);
-            }
-            //if (ix > 0)
-            {
-                int ixm1 = (ix > 0) ? ix-1 : NX-1;
-                Bond bond1;
-                bond1.name1 = convertName("SI4", ixm1, iy);
-                bond1.name2 = convertName("O12", ix, iy);
-                bondsOut.push_back(bond1);
-
-                Bond bond2;
-                bond2.name1 = convertName("SI27", ixm1, iy);
-                bond2.name2 = convertName("O35", ix, iy);
-                bondsOut.push_back(bond2);
-
-                Bond bond3;
-                bond3.name1 = convertName("SI22", ixm1, iy);
-                bond3.name2 = convertName("O18", ix, iy);
-                bondsOut.push_back(bond3);
-
-                Bond bond4;
-                bond4.name1 = convertName("O9", ixm1, iy);
-                bond4.name2 = convertName("SI25", ix, iy);
-                bondsOut.push_back(bond4);
-            }
-            //if (iy > 0)
-            {
-                int iym1 = (iy > 0) ? iy-1 : NY-1 ;
-                Bond bond1;
-                bond1.name1 = convertName("SI1", ix, iym1);
-                bond1.name2 = convertName("O17", ix, iy);
-                bondsOut.push_back(bond1);
-
-                Bond bond2;
-                bond2.name1 = convertName("O30", ix, iym1);
-                bond2.name2 = convertName("SI27", ix, iy);
-                bondsOut.push_back(bond2);
-
-                Bond bond3;
-                bond3.name1 = convertName("O31", ix, iym1);
-                bond3.name2 = convertName("SI28", ix, iy);
-                bondsOut.push_back(bond3);
-
-                Bond bond4;
-                bond4.name1 = convertName("SI23", ix, iym1);
-                bond4.name2 = convertName("O7", ix, iy);
-                bondsOut.push_back(bond4);
             }
         }
     }
@@ -230,69 +132,6 @@ int main(int argc, char *argv[])
         atomsOut[i].z = xyzOut.atoms[i].z;
     }
 
-    std::ofstream rtpOutFile;
-    rtpOutFile.open("slab.rtp");
-
-    rtpOutFile << "[ bondedtypes ]" << std::endl;
-    rtpOutFile << "; bonds  angles  dihedrals  impropers  all_dihedrals  nrexcl  HH14  RemoveDih " << std::endl;
-    rtpOutFile << "1       5        9          2            1           3      1       0" << std::endl;
-
-    //rtpOutFile << "[ SiO_" << NX << "_" << NY << " ]" << std::endl;
-    rtpOutFile << "[ SiO ]" << std::endl;
-    rtpOutFile << "; " << std::endl;
-    rtpOutFile << "[ atoms ]" << std::endl;
-    for (auto atomOut : atomsOut)
-    {
-        //rtpOutFile << "  " << atomOut.name << "     " << atomOut.type << " " << atomOut.charge << "   " << atomOut.cgr << std::endl;
-        rtpOutFile << "  " << nameToShortName(atomOut.name) << "     " << atomOut.type << " " << atomOut.charge << "   " << atomOut.cgr << std::endl;
-    }
-    rtpOutFile << "[ bonds ]" << std::endl;
-    for (auto bondOut : bondsOut)
-    {
-        //rtpOutFile << "   " << bondOut.name1 << "   " << bondOut.name2 << std::endl;
-        rtpOutFile << "   " << nameToShortName(bondOut.name1) << "   " << nameToShortName(bondOut.name2) << std::endl;
-    }
-    rtpOutFile.close();
-
-    PSF psfOut;
-    psfOut.natom = atomsOut.size();
-    psfOut.nbond = bondsOut.size();
-    psfOut.ntheta = 0;
-    psfOut.nphi = 0;
-    psfOut.nimphi = 0;
-    psfOut.ncmap = 0;
-    psfOut.nnb = 0;
-
-    psfOut.atoms = (PSFAtom*)calloc(psfOut.natom, sizeof(PSFAtom));
-    psfOut.bonds = (PSFBond*)calloc(psfOut.nbond, sizeof(PSFBond));
-
-    idx = 0;
-    for (auto atomOut : atomsOut)
-    {
-        PSFAtom atom;
-        atom.id = atomNameToIdx[atomOut.name] + 1;
-        sprintf(atom.name, "%3s ", atomOut.name.substr(0, 3).c_str());
-        sprintf(atom.type, "%s", atomOut.type.c_str());
-        atom.q = atomOut.charge;
-        
-        atom.resid = 1 + atomOut.ix + NX*atomOut.iy;
-        sprintf(atom.resName, "SiO2");
-        sprintf(atom.segment, "SiO2");
-        atom.m = 1.0;
-        psfOut.atoms[idx] = atom;
-        idx ++;
-    }
-    idx = 0;
-    for (auto bondOut : bondsOut)
-    {
-        PSFBond bond;
-        bond.i = atomNameToIdx[bondOut.name1] + 1;
-        bond.j = atomNameToIdx[bondOut.name2] + 1;
-        psfOut.bonds[idx] = bond;
-        idx ++;
-    }
-    writePSF("slab.psf", &psfOut);
-
     PDB pdbOut;
     pdbOut.atomCount = atomsOut.size();
     pdbOut.atoms = (PDBAtom*)calloc(pdbOut.atomCount, sizeof(PDBAtom));
@@ -303,8 +142,7 @@ int main(int argc, char *argv[])
     for (auto atomOut : atomsOut)
     {
         pdbOut.atoms[idx].id = idx + 1;
-        //sprintf(pdbOut.atoms[idx].name, "%s", nameToShortName(atomOut.name).c_str());
-        sprintf(pdbOut.atoms[idx].name, "%s", atomOut.oldName.c_str());
+        sprintf(pdbOut.atoms[idx].name, "%s", atomOut.name.c_str());
         pdbOut.atoms[idx].chain = 'A';
         sprintf(pdbOut.atoms[idx].resName, "SiO");
         pdbOut.atoms[idx].altLoc = ' ';
