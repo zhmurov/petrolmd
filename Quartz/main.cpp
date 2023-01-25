@@ -172,11 +172,11 @@ int main(int argc, char *argv[])
             atomOut.y -= 0.5*b;
             if (atomOut.x < 0)
             {
-                atomOut.x += a;
+                atomOut.x += a*NX;
             }
             if (atomOut.y < 0)
             {
-                atomOut.y += b;
+                atomOut.y += b*NY;
             }
         }
         fprintf(groOut, "%5d%-5s%5s%5d%8.3f%8.3f%8.3f\n",
@@ -189,6 +189,6 @@ int main(int argc, char *argv[])
             atomOut.z*0.1);
         idx++;
     }
-    fprintf(groOut, "%f %f %f\n", a*NX, b*NY, LZ);
+    fprintf(groOut, "%f %f %f\n", a*NX*0.1, b*NY*0.1, LZ*0.1);
     fclose(groOut);
 }
