@@ -6,7 +6,6 @@ Creating the coordinates and topology for a quartz slab of a given size
         cp ~/git/artemzhmurov/charmm36/specbond.dat .
         cp ~/git/artemzhmurov/petrolmd/files/em_vac.mdp em.mdp
         ~/git/artemzhmurov/petrolmd/build/Quartz/create_quartz
-        rm slab.psf slab.xyz slab.rtp
         $GMX pdb2gmx -f slab.pdb -o slab.gro -p slab.top -ff charmm36 -water tip3p
         $GMX editconf -f slab.gro -o slab.gro -d 0.1
         $GMX editconf -f slab.gro -o slab.gro -box 100 100 100 -noc

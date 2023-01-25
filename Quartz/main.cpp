@@ -13,6 +13,9 @@
 
 #define NX 2
 #define NY 2
+#define LZ 50.0
+
+#define DOPBC true
 
 struct Atom
 {
@@ -146,7 +149,7 @@ int main(int argc, char *argv[])
         pdbOut.atoms[idx].chain = 'A';
         sprintf(pdbOut.atoms[idx].resName, "SiO");
         pdbOut.atoms[idx].altLoc = ' ';
-        pdbOut.atoms[idx].resid = atomOut.ix + NX*atomOut.iy;
+        pdbOut.atoms[idx].resid = atomOut.ix + NX*atomOut.iy + 1;
         pdbOut.atoms[idx].x = atomOut.x;
         pdbOut.atoms[idx].y = atomOut.y;
         pdbOut.atoms[idx].z = atomOut.z;
@@ -156,4 +159,36 @@ int main(int argc, char *argv[])
         idx ++;
     }
     writePDB("slab.pdb", &pdbOut);
+
+    FILE* groOut = fopen("slab.gro", "w");
+    fprintf(groOut, "Quartz slab (%dx%d)\n", NX, NY);
+    fprintf(groOut, "%d\n", static_cast<int>(atomsOut.size()));
+    idx = 0;
+    for (auto atomOut : atomsOut)
+    {
+        if (DOPBC)
+        {
+            atomOut.x -= 0.5*a;
+            atomOut.y -= 0.5*b;
+            if (atomOut.x < 0)
+            {
+                atomOut.x += a;
+            }
+            if (atomOut.y < 0)
+            {
+                atomOut.y += b;
+            }
+        }
+        fprintf(groOut, "%5d%-5s%5s%5d%8.3f%8.3f%8.3f\n",
+            atomOut.ix + NX*atomOut.iy + 1,
+            "SiO",
+            atomOut.name.c_str(),
+            idx + 1,
+            atomOut.x*0.1, // A to nm
+            atomOut.y*0.1,
+            atomOut.z*0.1);
+        idx++;
+    }
+    fprintf(groOut, "%f %f %f\n", a*NX, b*NY, LZ);
+    fclose(groOut);
 }
