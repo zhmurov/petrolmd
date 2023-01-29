@@ -123,12 +123,13 @@ Note, that if these bonds are added on top of those listed in the topology file 
 
     .. code-block:: shell
 
+        GMX=/usr/local/gromacs/bin/gmx
         SYSTEM_NAME=slab
         FFHOME=~/git/artemzhmurov/charmm36
         PETROLMD=~/git/artemzhmurov/petrolmd
-        cp ~${FFHOME}/specbond.dat .
-        cp ~${PETROLMD}/files/em_vac.mdp em.mdp
-        ~${PETROLMD}/build/Quartz/create_quartz
+        cp ${FFHOME}/specbond.dat .
+        cp ${PETROLMD}/files/em_vac.mdp em.mdp
+        ${PETROLMD}/build/Quartz/create_quartz
         $GMX pdb2gmx -f ${SYSTEM_NAME}.pdb -o ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -ff charmm36 -water tip3p
         $GMX editconf -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -d 0.1
         $GMX editconf -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -box 100 100 100 -noc
@@ -162,11 +163,12 @@ The bonds within residue (within one unit) are added regardless of periodic boun
 
     .. code-block:: shell
 
+        GMX=/usr/local/gromacs/bin/gmx
         SYSTEM_NAME=slab
         FFHOME=~/git/artemzhmurov/charmm36
         PETROLMD=~/git/artemzhmurov/petrolmd
-        ~${PETROLMD}/build/Quartz/create_quartz
-        cp ~${FFHOME}/specbond.dat .
+        ${PETROLMD}/build/Quartz/create_quartz
+        cp ${FFHOME}/specbond.dat .
         $GMX pdb2gmx -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -ff charmm36 -water tip3p
         $GMX solvate -cp ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top
         cp ${PETROLMD}/files/mdp-charmm36/*.mdp .
