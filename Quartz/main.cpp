@@ -2,18 +2,13 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <string.h>
 #include <sstream>
 #include <iomanip>
 #include <iostream>
 #include <vector>
 
 #include "xyzio.h"
-
-#define NX 10
-#define NY 10
-#define LZ 200.0
-
-#define DOPBC true
 
 struct Atom
 {
@@ -28,11 +23,30 @@ struct Atom
 
 int main(int argc, char *argv[])
 {
+    if (argc < 8)
+    {
+        std::cout << "Usags: " << argv[0] << "<input xyz> <input crystal dat> <output file name> <use pbc (yes/no)> Nx Ny Lz(in A)" << std::endl;
+    }
+
     XYZ xyzIn;
-    readXYZ("/home/zhmurov/git/artemzhmurov/petrolmd/Quartz/files/input.xyz", &xyzIn);
+    readXYZ(argv[1], &xyzIn);
+    //readXYZ("/home/zhmurov/git/artemzhmurov/petrolmd/Quartz/files/input.xyz", &xyzIn);
     
     std::ifstream ucFile;
-    ucFile.open("/home/zhmurov/git/artemzhmurov/petrolmd/Quartz/files/crystal.dat");
+    ucFile.open(argv[2]);
+    //ucFile.open("/home/zhmurov/git/artemzhmurov/petrolmd/Quartz/files/crystal.dat");
+
+    std::string outputFilename(argv[3]);
+
+    bool dopbc = false;
+    if (strncmp(argv[4], "yes", 3) == 0)
+    {
+        dopbc = true;
+    }
+
+    int Nx = atoi(argv[5]);
+    int Ny = atoi(argv[6]);
+    float Lz = atof(argv[7]);
 
     float a, b, c, alpha, beta, gamma;
 
@@ -45,20 +59,20 @@ int main(int argc, char *argv[])
 
     std::cout << a << "  " << b << "  " << c << "  " << alpha << "  " << beta << "  " << gamma << std::endl;
 
-    std::cout << "Recommended x - y box size is " << a*NX << " - " << b*NY << std::endl;
+    std::cout << "Recommended x - y box size is " << a*Nx << " - " << b*Ny << std::endl;
 
     ucFile.close();
 
     XYZ xyzOut;
-    xyzOut.atomCount = xyzIn.atomCount*NX*NY;
+    xyzOut.atomCount = xyzIn.atomCount*Nx*Ny;
     xyzOut.atoms = (XYZAtom*)calloc(xyzOut.atomCount, sizeof(XYZAtom));
-    for (int iy = 0; iy < NY; iy ++)
+    for (int iy = 0; iy < Ny; iy ++)
     {
-        for (int ix = 0; ix < NX; ix ++)
+        for (int ix = 0; ix < Nx; ix ++)
         {
             for (int i = 0; i < xyzIn.atomCount; i++)
             {
-                int iOut = i + ix*xyzIn.atomCount + iy*NX*xyzIn.atomCount;
+                int iOut = i + ix*xyzIn.atomCount + iy*Nx*xyzIn.atomCount;
                 xyzOut.atoms[iOut].name = xyzIn.atoms[i].name;
                 float x = xyzIn.atoms[i].x;
                 float y = xyzIn.atoms[i].y;
@@ -107,9 +121,9 @@ int main(int argc, char *argv[])
 
     int idx = 0;
 
-    for (int iy = 0; iy < NY; iy ++)
+    for (int iy = 0; iy < Ny; iy ++)
     {
-        for (int ix = 0; ix < NX; ix ++)
+        for (int ix = 0; ix < Nx; ix ++)
         {
             for (auto atomIn : atomsIn)
             {
@@ -133,28 +147,28 @@ int main(int argc, char *argv[])
         atomsOut[i].z = xyzOut.atoms[i].z;
     }
 
-    FILE* groOut = fopen("slab.gro", "w");
-    fprintf(groOut, "Quartz slab (%dx%d)\n", NX, NY);
+    FILE* groOut = fopen(outputFilename.c_str(), "w");
+    fprintf(groOut, "Quartz slab (%dx%d)\n", Nx, Ny);
     fprintf(groOut, "%d\n", static_cast<int>(atomsOut.size()));
     idx = 0;
     for (auto atomOut : atomsOut)
     {
-        if (DOPBC)
+        if (dopbc)
         {
             atomOut.x -= 0.5*a;
             atomOut.y -= 0.5*b;
             if (atomOut.x < 0)
             {
-                atomOut.x += a*NX;
+                atomOut.x += a*Nx;
             }
             if (atomOut.y < 0)
             {
-                atomOut.y += b*NY;
+                atomOut.y += b*Ny;
             }
-            atomOut.z += 0.5*LZ;
+            atomOut.z += 0.5*Lz;
         }
         fprintf(groOut, "%5d%-5s%5s%5d%8.3f%8.3f%8.3f\n",
-            atomOut.ix + NX*atomOut.iy + 1,
+            atomOut.ix + Nx*atomOut.iy + 1,
             "Q011",
             atomOut.name.c_str(),
             idx + 1,
@@ -163,6 +177,6 @@ int main(int argc, char *argv[])
             atomOut.z*0.1);
         idx++;
     }
-    fprintf(groOut, "%f %f %f\n", a*NX*0.1, b*NY*0.1, LZ*0.1);
+    fprintf(groOut, "%f %f %f\n", a*Nx*0.1, b*Ny*0.1, Lz*0.1);
     fclose(groOut);
 }

@@ -2,12 +2,14 @@
 
 # Set variables
 GMX=/usr/local/gromacs/bin/gmx
-SYSTEM_NAME=slab
+NX=10
+NY=10
+SYSTEM_NAME=slab_${NX}x${NY}
 FFHOME=~/git/artemzhmurov/charmm36
 PETROLMD=~/git/artemzhmurov/petrolmd
 
 # Create coordinates file for the slab
-${PETROLMD}/build/Quartz/create_quartz
+${PETROLMD}/build/Quartz/create_quartz ${PETROLMD}/Quartz/files/input.xyz ${PETROLMD}/Quartz/files/crystal.dat ${SYSTEM_NAME}.gro no 10 10 200.0
 
 # Create topology and minimize the structure
 cp ${FFHOME}/specbond.dat .
