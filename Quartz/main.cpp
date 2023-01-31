@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     rtpInStream.open("/home/zhmurov/git/artemzhmurov/charmm36/charmm36.ff/silicates.rtp");
 
     std::string line;
-    while (std::getline(rtpInStream, line) && line.compare("[ SiO ]") != 0)
+    while (std::getline(rtpInStream, line) && line.compare("[ Q011 ]") != 0)
     {
         
     }
@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
         }
         fprintf(groOut, "%5d%-5s%5s%5d%8.3f%8.3f%8.3f\n",
             atomOut.ix + NX*atomOut.iy + 1,
-            "SiO",
+            "Q011",
             atomOut.name.c_str(),
             idx + 1,
             atomOut.x*0.1, // A to nm
