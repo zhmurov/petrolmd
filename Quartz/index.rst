@@ -130,7 +130,7 @@ Note, that if these bonds are added on top of those listed in the topology file 
         cp ${FFHOME}/specbond.dat .
         cp ${PETROLMD}/files/em_vac.mdp em.mdp
         ${PETROLMD}/build/Quartz/create_quartz
-        $GMX pdb2gmx -f ${SYSTEM_NAME}.pdb -o ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -ff charmm36 -water tip3p
+        $GMX pdb2gmx -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -ff charmm36 -water tip3p
         $GMX editconf -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -d 0.1
         $GMX editconf -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -box 100 100 100 -noc
         $GMX grompp -f em.mdp -c ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -o ${SYSTEM_NAME}_em.tpr
@@ -138,7 +138,7 @@ Note, that if these bonds are added on top of those listed in the topology file 
         cp ${SYSTEM_NAME}.top ${SYSTEM_NAME}.itp
         sed -i -n '/\[ moleculetype \]/,$p' ${SYSTEM_NAME}.itp
         sed -i '/; Include Position restraint file/,$d' ${SYSTEM_NAME}.itp
-        sed -i "s/Other_chain_A/${SYSTEM_NAME}/g" ${SYSTEM_NAME}.itp
+        sed -i "s/Other/${SYSTEM_NAME}/g" ${SYSTEM_NAME}.itp
         mkdir toppar
         cp ${SYSTEM_NAME}.itp toppar/${SYSTEM_NAME}.itp
         mkdir coord
