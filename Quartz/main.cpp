@@ -8,12 +8,10 @@
 #include <vector>
 
 #include "xyzio.h"
-#include "psfio.h"
-#include "pdbio.h"
 
-#define NX 2
-#define NY 2
-#define LZ 50.0
+#define NX 10
+#define NY 10
+#define LZ 200.0
 
 #define DOPBC true
 
@@ -135,31 +133,6 @@ int main(int argc, char *argv[])
         atomsOut[i].z = xyzOut.atoms[i].z;
     }
 
-    PDB pdbOut;
-    pdbOut.atomCount = atomsOut.size();
-    pdbOut.atoms = (PDBAtom*)calloc(pdbOut.atomCount, sizeof(PDBAtom));
-    pdbOut.ssCount = 0;
-    pdbOut.symmetryCount = 0;
-    pdbOut.matrixCount = 0;
-    idx = 0;
-    for (auto atomOut : atomsOut)
-    {
-        pdbOut.atoms[idx].id = idx + 1;
-        sprintf(pdbOut.atoms[idx].name, "%s", atomOut.name.c_str());
-        pdbOut.atoms[idx].chain = 'A';
-        sprintf(pdbOut.atoms[idx].resName, "SiO");
-        pdbOut.atoms[idx].altLoc = ' ';
-        pdbOut.atoms[idx].resid = atomOut.ix + NX*atomOut.iy + 1;
-        pdbOut.atoms[idx].x = atomOut.x;
-        pdbOut.atoms[idx].y = atomOut.y;
-        pdbOut.atoms[idx].z = atomOut.z;
-        sprintf(pdbOut.atoms[idx].segment, "A");
-        pdbOut.atoms[idx].occupancy = 0.0;
-        pdbOut.atoms[idx].beta = 0.0;
-        idx ++;
-    }
-    writePDB("slab.pdb", &pdbOut);
-
     FILE* groOut = fopen("slab.gro", "w");
     fprintf(groOut, "Quartz slab (%dx%d)\n", NX, NY);
     fprintf(groOut, "%d\n", static_cast<int>(atomsOut.size()));
@@ -178,6 +151,7 @@ int main(int argc, char *argv[])
             {
                 atomOut.y += b*NY;
             }
+            atomOut.z += 0.5*LZ;
         }
         fprintf(groOut, "%5d%-5s%5s%5d%8.3f%8.3f%8.3f\n",
             atomOut.ix + NX*atomOut.iy + 1,
