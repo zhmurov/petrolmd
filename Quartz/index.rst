@@ -138,11 +138,14 @@ Note, that if these bonds are added on top of those listed in the topology file 
         cp ${SYSTEM_NAME}.top ${SYSTEM_NAME}.itp
         sed -i -n '/\[ moleculetype \]/,$p' ${SYSTEM_NAME}.itp
         sed -i '/; Include Position restraint file/,$d' ${SYSTEM_NAME}.itp
-        sed -i "s/Other_chain_A/SiO2_2x2/g" ${SYSTEM_NAME}.itp
+        sed -i "s/Other_chain_A/${SYSTEM_NAME}/g" ${SYSTEM_NAME}.itp
         mkdir toppar
         cp ${SYSTEM_NAME}.itp toppar/${SYSTEM_NAME}.itp
-        cp ${SYSTEM_NAME}_em.gro ${SYSTEM_NAME}.gro
-        $GMX editconf -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -box 5 5 5 -noc
+        mkdir coord
+        cp ${SYSTEM_NAME}_em.gro coord/${SYSTEM_NAME}.gro
+        cp ${PETROLMD}/Quartz/files/sislab.top ${SYSTEM_NAME}.top
+        sed -i "s/SiO2_2x2/${SYSTEM_NAME}/g" ${SYSTEM_NAME}.top
+        $GMX editconf -f coord/${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -box 5 5 5 -noc
         $GMX solvate -cp ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top
         cp ${PETROLMD}/files/mdp-charmm36/*.mdp .
         $GMX grompp -f em.mdp -c ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top -o em.tpr
