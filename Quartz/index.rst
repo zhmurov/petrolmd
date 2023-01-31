@@ -144,7 +144,7 @@ Note, that if these bonds are added on top of those listed in the topology file 
         mkdir coord
         cp ${SYSTEM_NAME}_em.gro coord/${SYSTEM_NAME}.gro
         cp ${PETROLMD}/Quartz/files/sislab.top ${SYSTEM_NAME}.top
-        sed -i "s/SiO2_2x2/${SYSTEM_NAME}/g" ${SYSTEM_NAME}.top
+        sed -i "s/NEWMOLECULENAME/${SYSTEM_NAME}/g" ${SYSTEM_NAME}.top
         $GMX editconf -f coord/${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -box 5 5 5 -noc
         $GMX solvate -cp ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top
         cp ${PETROLMD}/files/mdp-charmm36/*.mdp .

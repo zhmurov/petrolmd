@@ -2,12 +2,12 @@
 #include "charmm36.ff/forcefield.itp"
 #include "charmm36.ff/tip3p.itp"
 #include "charmm36.ff/ions.itp"
-#include "toppar/SiO2_2x2.itp"
+#include "toppar/NEWMOLECULENAME.itp"
 
 [ system ]
 ; Name
-sislab in water
+NEWMOLECULENAME
 
 [ molecules ]
 ; Compound     #mols
-SiO2_2x2      1
+NEWMOLECULENAME      1

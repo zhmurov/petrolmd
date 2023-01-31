@@ -29,7 +29,7 @@ cp ${SYSTEM_NAME}.itp toppar/${SYSTEM_NAME}.itp
 mkdir coord
 cp ${SYSTEM_NAME}_em.gro coord/${SYSTEM_NAME}.gro
 cp ${PETROLMD}/Quartz/files/sislab.top ${SYSTEM_NAME}.top
-sed -i "s/SiO2_2x2/${SYSTEM_NAME}/g" ${SYSTEM_NAME}.top
+sed -i "s/NEWMOLECULENAME/${SYSTEM_NAME}/g" ${SYSTEM_NAME}.top
 
 # Run test simulations
 $GMX editconf -f coord/${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -box 10 10 10 -noc
