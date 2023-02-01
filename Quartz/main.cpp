@@ -25,16 +25,14 @@ int main(int argc, char *argv[])
 {
     if (argc < 8)
     {
-        std::cout << "Usags: " << argv[0] << "<input xyz> <input crystal dat> <output file name> <use pbc (yes/no)> Nx Ny Lz(in A)" << std::endl;
+        std::cout << "Usags: " << argv[0] << "<input xyz> <input crystal dat> <output file name> <use pbc (yes/no)> <Nx> <Ny> <Lz (in A)>" << std::endl;
     }
 
     XYZ xyzIn;
     readXYZ(argv[1], &xyzIn);
-    //readXYZ("/home/zhmurov/git/artemzhmurov/petrolmd/Quartz/files/input.xyz", &xyzIn);
     
     std::ifstream ucFile;
     ucFile.open(argv[2]);
-    //ucFile.open("/home/zhmurov/git/artemzhmurov/petrolmd/Quartz/files/crystal.dat");
 
     std::string outputFilename(argv[3]);
 
