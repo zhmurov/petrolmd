@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>
+#include <cmath>
 #include <vector>
 
 #include "xyzio.h"
@@ -42,10 +43,6 @@ int main(int argc, char *argv[])
         dopbc = true;
     }
 
-    int Nx = atoi(argv[5]);
-    int Ny = atoi(argv[6]);
-    float Lz = atof(argv[7]);
-
     float a, b, c, alpha, beta, gamma;
 
     ucFile >> a;
@@ -56,6 +53,32 @@ int main(int argc, char *argv[])
     ucFile >> gamma;
 
     std::cout << a << "  " << b << "  " << c << "  " << alpha << "  " << beta << "  " << gamma << std::endl;
+
+    int Nx = atoi(argv[5]);
+    int Ny = atoi(argv[6]);
+    float Lz = atof(argv[7]);
+    int Nz = ceil(Lz/c);
+
+    alpha *= M_PI/180.0;
+    beta *= M_PI/180.0;
+    gamma *= M_PI/180.0;
+
+    float cosalphastar = (cosf(beta)*cosf(gamma) - cosf(alpha)) / (sinf(beta)*sin(gamma));
+    float sinalphastar = sqrtf(1 - cosalphastar*cosalphastar);
+
+    float xx = a;
+    float xy = b*cosf(gamma);
+    float xz = c*cosf(beta);
+
+    float yx = 0.0;
+    float yy = b*sin(gamma);
+    float yz = -c*sin(beta)*cosalphastar;
+
+    float zx = 0.0;
+    float zy = 0.0;
+    float zz = c*sin(beta)*sinalphastar;
+
+
 
     std::cout << "Recommended x - y box size is " << a*Nx << " - " << b*Ny << std::endl;
 
@@ -76,9 +99,10 @@ int main(int argc, char *argv[])
                 float y = xyzIn.atoms[i].y;
                 float z = xyzIn.atoms[i].z;
 
-                xyzOut.atoms[iOut].x = x + a*ix;
-                xyzOut.atoms[iOut].y = y + b*iy;
-                xyzOut.atoms[iOut].z = z;
+                int iz = 0;
+                xyzOut.atoms[iOut].x = x + xx*ix + xy*iy + xz*iz;
+                xyzOut.atoms[iOut].y = y + yx*ix + yy*iy + yz*iz;
+                xyzOut.atoms[iOut].z = z + zx*ix + zy*iy + zz*iz;
 
             }
         }
@@ -153,8 +177,8 @@ int main(int argc, char *argv[])
     {
         if (dopbc)
         {
-            atomOut.x -= 0.5*a;
-            atomOut.y -= 0.5*b;
+            atomOut.x -= 0.5*(xx + xy + xz);
+            atomOut.y -= 0.5*(yx + yy + yz);
             if (atomOut.x < 0)
             {
                 atomOut.x += a*Nx;
@@ -175,6 +199,10 @@ int main(int argc, char *argv[])
             atomOut.z*0.1);
         idx++;
     }
-    fprintf(groOut, "%f %f %f\n", a*Nx*0.1, b*Ny*0.1, Lz*0.1);
+    fprintf(groOut, "%f %f %f %f %f %f %f %f %f\n", 
+            xx*Nx*0.1, yy*Ny*0.1, zz*Nz*0.1,
+            xy*Ny*0.1, xz*Nz*0.1,
+            yx*Nx*0.1, yz*Nz*0.1, 
+            zx*Nx*0.1, zy*Ny*0.1);
     fclose(groOut);
 }
