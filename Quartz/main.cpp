@@ -13,16 +13,16 @@
 
 struct Coord
 {
-    float x;
-    float y;
-    float z;
+    double x;
+    double y;
+    double z;
 };
 
 struct Atom
 {
     std::string name;
     std::string type;
-    float charge;
+    double charge;
     int cgr;
     Coord r;
     int ix;
@@ -34,7 +34,14 @@ struct Atom
 #define YY 1
 #define ZZ 2
 
-typedef float matrix[DIM][DIM];
+typedef double matrix[DIM][DIM];
+
+void printMatrix(matrix A)
+{
+    std::cout << " || " << A[XX][XX] << " " << A[XX][YY] << " " << A[XX][ZZ] << " ||" <<std::endl;
+    std::cout << " || " << A[YY][XX] << " " << A[YY][YY] << " " << A[YY][ZZ] << " ||" <<std::endl;
+    std::cout << " || " << A[ZZ][XX] << " " << A[ZZ][YY] << " " << A[ZZ][ZZ] << " ||" <<std::endl;
+}
 
 double cot(double alpha)
 {
@@ -46,10 +53,10 @@ double csc(double alpha)
     return 1.0/sin(alpha);
 }
 
-void createBoxMatrix(matrix box, const float a, const float b, const float c, const float alpha, const float beta, const float gamma)
+void createBoxMatrix(matrix box, const double a, const double b, const double c, const double alpha, const double beta, const double gamma)
 {
-    float cosalphastar = (cos(beta)*cos(gamma) - cos(alpha)) / (sin(beta)*sin(gamma));
-    float sinalphastar = sqrt(1 - cosalphastar*cosalphastar);
+    double cosalphastar = (cos(beta)*cos(gamma) - cos(alpha)) / (sin(beta)*sin(gamma));
+    double sinalphastar = sqrt(1 - cosalphastar*cosalphastar);
 
     box[XX][XX] = a;
     box[XX][YY] = b*cos(gamma);
@@ -64,12 +71,12 @@ void createBoxMatrix(matrix box, const float a, const float b, const float c, co
     box[ZZ][ZZ] = c*sin(beta)*sinalphastar;
 }
 
-void createInverseBoxMatrix(matrix ibox, const float a, const float b, const float c, const float alpha, const float beta, const float gamma)
+void createInverseBoxMatrix(matrix ibox, const double a, const double b, const double c, const double alpha, const double beta, const double gamma)
 {
-    float cosalphastar = (cosf(beta)*cosf(gamma) - cosf(alpha)) / (sinf(beta)*sin(gamma));
-    float sinalphastar = sqrtf(1 - cosalphastar*cosalphastar);
-    float cscalphastar = 1.0/sinalphastar;
-    float cotalphastar = cosalphastar/sinalphastar;
+    double cosalphastar = (cosf(beta)*cosf(gamma) - cosf(alpha)) / (sinf(beta)*sin(gamma));
+    double sinalphastar = sqrtf(1 - cosalphastar*cosalphastar);
+    double cscalphastar = 1.0/sinalphastar;
+    double cotalphastar = cosalphastar/sinalphastar;
 
     ibox[XX][XX] = 1.0/a;
     ibox[XX][YY] = -cot(gamma)/a;
@@ -100,79 +107,34 @@ Coord calcBoxCenter(const matrix box)
     return center;
 }
 
-Coord putAtomInTriclinicBox(const matrix box, Coord position, const Coord center)
+Coord matrixTimesVector(const matrix A, const Coord r)
 {
-    /* The product of matrix shm with a coordinate gives the shift vector
-       which is required determine the periodic cell position */
-    float shm01 = box[1][0] / box[1][1];
-    float shm02 = (box[1][1] * box[2][0] - box[2][1] * box[1][0]) / (box[1][1] * box[2][2]);
-    float shm12 = box[2][1] / box[2][2];
+    Coord result;
+    result.x = A[XX][XX]*r.x + A[XX][YY]*r.y + A[XX][ZZ]*r.z;
+    result.y = A[YY][XX]*r.x + A[YY][YY]*r.y + A[YY][ZZ]*r.z;
+    result.z = A[ZZ][XX]*r.x + A[ZZ][YY]*r.y + A[ZZ][ZZ]*r.z;
+    return result;
+}
 
-    Coord shiftCenter;
-    shiftCenter.x = 0.0;
-    shiftCenter.y = 0.0;
-    shiftCenter.z = 0.0;
-    for (int d = 0; d < DIM; d++)
+void putInsideInterval(double &x)
+{
+    while (x < 0)
     {
-        shiftCenter.x += box[d][XX];
-        shiftCenter.y += box[d][YY];
-        shiftCenter.z += box[d][ZZ];
+        x += 1.0;
     }
-    shiftCenter.x *= 0.5;
-    shiftCenter.y *= 0.5;
-    shiftCenter.z *= 0.5;
-    shiftCenter.x -= center.x;
-    shiftCenter.y -= center.y;
-    shiftCenter.z -= center.z;
-    
-    shiftCenter.x = shm01 * shiftCenter.y + shm02 * shiftCenter.z;
-    shiftCenter.y = shm12 * shiftCenter.z;
-    shiftCenter.z = 0;
+    while (x > 1.0)
+    {
+        x -= 1.0;
+    }
+}
 
-    Coord r = position;
-
-    while (r.z - shiftCenter.z < 0)
-    {
-        r.x += box[ZZ][XX];
-        r.y += box[ZZ][YY];
-        r.z += box[ZZ][ZZ];
-    }
-    while (r.z - shiftCenter.z >= box[ZZ][ZZ])
-    {
-        r.x -= box[ZZ][XX];
-        r.y -= box[ZZ][YY];
-        r.z -= box[ZZ][ZZ];
-    }
-    shiftCenter.y += shm12 * r.z;
-     
-    while (r.y - shiftCenter.y < 0)
-    {
-        r.x += box[YY][XX];
-        r.y += box[YY][YY];
-        r.z += box[YY][ZZ];
-    }
-    while (r.y - shiftCenter.y >= box[YY][YY])
-    {
-        r.x -= box[YY][XX];
-        r.y -= box[YY][YY];
-        r.z -= box[YY][ZZ];
-    }
-
-    shiftCenter.x += shm01 * r.y + shm02 * r.z;
-    while (r.x - shiftCenter.x < 0)
-    {
-        r.x += box[XX][XX];
-        r.y += box[XX][YY];
-        r.z += box[XX][ZZ];
-    }
-    while (r.x - shiftCenter.x >= box[XX][XX])
-    {
-        r.x -= box[XX][XX];
-        r.y -= box[XX][YY];
-        r.z -= box[XX][ZZ];
-    }
-
-    return r;
+Coord putAtomInTriclinicBox(const matrix box, const matrix ibox, Coord position, double a, double b, double c)
+{
+    Coord rf = matrixTimesVector(ibox, position);
+    putInsideInterval(rf.x);
+    putInsideInterval(rf.y);
+    putInsideInterval(rf.z);    
+    return matrixTimesVector(box, rf);
 }
 
 int main(int argc, char *argv[])
@@ -196,7 +158,7 @@ int main(int argc, char *argv[])
         dopbc = true;
     }
 
-    float a, b, c, alpha, beta, gamma;
+    double a, b, c, alpha, beta, gamma;
 
     ucFile >> a;
     ucFile >> b;
@@ -213,11 +175,15 @@ int main(int argc, char *argv[])
 
     int Nx = atoi(argv[5]);
     int Ny = atoi(argv[6]);
-    float Lz = atof(argv[7]);
+    double Lz = atof(argv[7]);
     int Nz = ceil(Lz/c);
 
     matrix box;
     createBoxMatrix(box, a*Nx, b*Ny, c*Nz, alpha, beta, gamma);
+    matrix ibox;
+    createInverseBoxMatrix(ibox, a*Nx, b*Ny, c*Nz, alpha, beta, gamma);
+    printMatrix(box);
+    printMatrix(ibox);
 
     matrix uc;
     createBoxMatrix(uc, a, b, c, alpha, beta, gamma);
@@ -237,9 +203,9 @@ int main(int argc, char *argv[])
             {
                 int iOut = i + ix*xyzIn.atomCount + iy*Nx*xyzIn.atomCount;
                 xyzOut.atoms[iOut].name = xyzIn.atoms[i].name;
-                float x = xyzIn.atoms[i].x;
-                float y = xyzIn.atoms[i].y;
-                float z = xyzIn.atoms[i].z;
+                double x = xyzIn.atoms[i].x;
+                double y = xyzIn.atoms[i].y;
+                double z = xyzIn.atoms[i].z;
 
                 int iz = 0;
                 xyzOut.atoms[iOut].x = x + uc[XX][XX]*ix + uc[XX][YY]*iy + uc[XX][ZZ]*iz;
@@ -316,16 +282,15 @@ int main(int argc, char *argv[])
     fprintf(groOut, "%d\n", static_cast<int>(atomsOut.size()));
     idx = 0;
 
-    Coord center = calcBoxCenter(box);
     for (auto atomOut : atomsOut)
     {
         Coord r = atomOut.r;
         if (dopbc)
         {
-            /*r.x -= 0.5*a;
+            r.x -= 0.5*a;
             r.y -= 0.5*b;
-            r.z += 0.5*Lz;*/
-            r = putAtomInTriclinicBox(box, r, center);
+            r.z += 0.5*Lz;
+            r = putAtomInTriclinicBox(box, ibox, r, a*Nx, b*Ny, c*Nz);
         }
         fprintf(groOut, "%5d%-5s%5s%5d%8.3f%8.3f%8.3f\n",
             atomOut.ix + Nx*atomOut.iy + 1,
