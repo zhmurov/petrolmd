@@ -172,7 +172,7 @@ The bonds within residue (within one unit) are added regardless of periodic boun
         SYSTEM_NAME=slab_${NX}x${NY}
         FFHOME=~/git/artemzhmurov/charmm36
         PETROLMD=~/git/artemzhmurov/petrolmd
-        ${PETROLMD}/build/Quartz/create_quartz ${PETROLMD}/Quartz/files/input.xyz ${PETROLMD}/Quartz/files/crystal.dat ${SYSTEM_NAME}.gro no 10 10 200.0
+        ${PETROLMD}/build/Quartz/create_quartz ${PETROLMD}/Quartz/files/input.xyz ${PETROLMD}/Quartz/files/crystal.dat ${SYSTEM_NAME}.gro yes 10 10 200.0
         cp ${FFHOME}/specbond.dat .
         $GMX pdb2gmx -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -ff charmm36 -water tip3p
         $GMX solvate -cp ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top
