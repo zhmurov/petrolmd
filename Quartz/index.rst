@@ -181,7 +181,7 @@ The bonds within residue (within one unit) are added regardless of periodic boun
         GMX=/usr/local/gromacs/bin/gmx
         NX=10
         NY=10
-        SYSTEM_NAME=slab_${NX}x${NY}
+        SYSTEM_NAME=slab_${NX}x${NY}_PBC
         FFHOME=~/git/artemzhmurov/charmm36
         PETROLMD=~/git/artemzhmurov/petrolmd
 
@@ -191,16 +191,16 @@ The bonds within residue (within one unit) are added regardless of periodic boun
         # Make a topology/coordinates pair for the entire molecule
         cp ${FFHOME}/specbond.dat .
         $GMX pdb2gmx -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -ff charmm36 -water tip3p
-        cp ${SYSTEM_NAME}.top ${SYSTEM_NAME}_PBC.itp
-        sed -i -n '/\[ moleculetype \]/,$p' ${SYSTEM_NAME}_PBC.itp
-        sed -i '/; Include Position restraint file/,$d' ${SYSTEM_NAME}_PBC.itp
-        sed -i "s/Other/${SYSTEM_NAME}/g" ${SYSTEM_NAME}_PBC.itp
+        cp ${SYSTEM_NAME}.top ${SYSTEM_NAME}.itp
+        sed -i -n '/\[ moleculetype \]/,$p' ${SYSTEM_NAME}.itp
+        sed -i '/; Include Position restraint file/,$d' ${SYSTEM_NAME}.itp
+        sed -i "s/Other/${SYSTEM_NAME}/g" ${SYSTEM_NAME}.itp
         mkdir toppar
-        cp ${SYSTEM_NAME}.itp toppar/${SYSTEM_NAME}_PBC.itp
+        cp ${SYSTEM_NAME}.itp toppar/${SYSTEM_NAME}.itp
         mkdir coord
-        cp ${SYSTEM_NAME}_em.gro coord/${SYSTEM_NAME}_PBC.gro
-        cp ${PETROLMD}/Quartz/files/sislab.top ${SYSTEM_NAME}_PBC.top
-        sed -i "s/NEWMOLECULENAME/${SYSTEM_NAME}_PBC/g" ${SYSTEM_NAME}_PBC.top
+        cp ${SYSTEM_NAME}_em.gro coord/${SYSTEM_NAME}.gro
+        cp ${PETROLMD}/Quartz/files/sislab.top ${SYSTEM_NAME}.top
+        sed -i "s/NEWMOLECULENAME/${SYSTEM_NAME}/g" ${SYSTEM_NAME}.top
 
         # Run test simulations
         $GMX solvate -cp ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top
