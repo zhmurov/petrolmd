@@ -188,8 +188,6 @@ int main(int argc, char *argv[])
     matrix uc;
     createBoxMatrix(uc, a, b, c, alpha, beta, gamma);
 
-    std::cout << "Recommended x - y box size is " << a*Nx << " - " << b*Ny << std::endl;
-
     ucFile.close();
 
     XYZ xyzOut;
@@ -302,10 +300,10 @@ int main(int argc, char *argv[])
             r.z*0.1);
         idx++;
     }
-    fprintf(groOut, "%f %f %f %f %f %f %f %f %f\n", 
-            box[XX][XX]*Nx*0.1, box[YY][YY]*Ny*0.1, box[ZZ][ZZ]*Nz*0.1,
-            box[XX][YY]*Ny*0.1, box[XX][ZZ]*Nz*0.1,
-            box[YY][XX]*Nx*0.1, box[YY][ZZ]*Nz*0.1, 
-            box[ZZ][XX]*Nx*0.1, box[ZZ][YY]*Ny*0.1);
+    fprintf(groOut, "%8.3f %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n",
+            box[XX][XX]*0.1, box[YY][YY]*0.1, box[ZZ][ZZ]*0.1,
+            box[YY][XX]*0.1, box[ZZ][XX]*0.1,
+            box[XX][YY]*0.1, box[ZZ][YY]*0.1,
+            box[XX][ZZ]*0.1, box[YY][ZZ]*0.1);
     fclose(groOut);
 }
