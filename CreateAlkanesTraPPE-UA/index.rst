@@ -154,21 +154,21 @@ Create PDB files
 
     mkdir toppar
     cd toppar
-    ${PETROLMD}/build/CreateAlkanes/create_alkanes
+    ${PETROLMD}/build/CreateAlkanesTraPPE-UA/create_alkanes
 
 Copy additional files, e.g. iso-butane and iso-pentane pdbs (see ``files/PDBs`` folder in this repo):
 
 .. code-block:: shell
 
-    cp ${PETROLMD}/CreateAlkanes/files/PDBs/C4H10_ISO.pdb .
-    cp ${PETROLMD}/CreateAlkanes/files/PDBs/C5H12_ISO.pdb .
+    cp ${PETROLMD}/CreateAlkanesTraPPE-UA/files/PDBs/C4H10_ISO.pdb .
+    cp ${PETROLMD}/CreateAlkanesTraPPE-UA/files/PDBs/C5H12_ISO.pdb .
 
 Make topologies
 ^^^^^^^^^^^^^^^
 
 .. code-block:: shell
 
-    bash ${PETROLMD}/CreateAlkanes/create_topologies.sh
+    bash ${PETROLMD}/CreateAlkanesTraPPE-UA/create_topologies.sh
 
 This will create ``.itp`` files for all the coordinates that we have in the folder. You will also need coordinates for the water molecule:
 
@@ -250,10 +250,10 @@ Building the system with separate compartments for water, liquid and gas phase h
 
         mkdir toppar
         cd toppar
-        ${PETROLMD}/build/CreateAlkanes/create_alkanes
-        cp ${PETROLMD}/CreateAlkanes/files/PDBs/C4H10_ISO.pdb .
-        cp ${PETROLMD}/CreateAlkanes/files/PDBs/C5H12_ISO.pdb .
-        bash ${PETROLMD}/CreateAlkanes/create_topologies.sh
+        ${PETROLMD}/build/CreateAlkanesTraPPE-UA/create_alkanes
+        cp ${PETROLMD}/CreateAlkanesTraPPE-UA/files/PDBs/C4H10_ISO.pdb .
+        cp ${PETROLMD}/CreateAlkanesTraPPE-UA/files/PDBs/C5H12_ISO.pdb .
+        bash ${PETROLMD}/CreateAlkanesTraPPE-UA/create_topologies.sh
         cp ${PETROLMD}/files/tip4p.gro .
         cp ${PETROLMD}/files/SOL.itp .
         cd ..
