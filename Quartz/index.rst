@@ -189,6 +189,8 @@ The bonds within residue (within one unit) are added regardless of periodic boun
         ${PETROLMD}/build/Quartz/create_quartz ${PETROLMD}/Quartz/files/input.xyz ${PETROLMD}/Quartz/files/crystal.dat ${SYSTEM_NAME}.gro yes ${NX} ${NY} 100.0
 
         # Make a topology/coordinates pair for the entire molecule
+        cp ${FFHOME}/specbond.dat .
+        $GMX pdb2gmx -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -ff charmm36 -water tip3p
         cp ${SYSTEM_NAME}.top ${SYSTEM_NAME}_PBC.itp
         sed -i -n '/\[ moleculetype \]/,$p' ${SYSTEM_NAME}_PBC.itp
         sed -i '/; Include Position restraint file/,$d' ${SYSTEM_NAME}_PBC.itp
@@ -201,8 +203,6 @@ The bonds within residue (within one unit) are added regardless of periodic boun
         sed -i "s/NEWMOLECULENAME/${SYSTEM_NAME}_PBC/g" ${SYSTEM_NAME}_PBC.top
 
         # Run test simulations
-        cp ${FFHOME}/specbond.dat .
-        $GMX pdb2gmx -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -ff charmm36 -water tip3p
         $GMX solvate -cp ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top
         cp ${PETROLMD}/files/mdp-charmm36/*.mdp .
         $GMX grompp -f em.mdp -c ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top -o em.tpr
