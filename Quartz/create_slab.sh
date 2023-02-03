@@ -9,7 +9,7 @@ FFHOME=~/git/artemzhmurov/charmm36
 PETROLMD=~/git/artemzhmurov/petrolmd
 
 # Create coordinates file for the slab
-${PETROLMD}/build/Quartz/create_quartz ${PETROLMD}/Quartz/files/input.xyz ${PETROLMD}/Quartz/files/crystal.dat ${SYSTEM_NAME}.gro no 10 10 200.0
+${PETROLMD}/build/Quartz/create_quartz ${PETROLMD}/Quartz/files/input.xyz ${PETROLMD}/Quartz/files/crystal.dat ${SYSTEM_NAME}.gro no ${NX} ${NY} 200.0
 
 # Create topology and minimize the structure
 cp ${FFHOME}/specbond.dat .
@@ -19,7 +19,6 @@ $GMX editconf -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -d 0.1
 $GMX editconf -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -box 100 100 100 -noc
 $GMX grompp -f em.mdp -c ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -o ${SYSTEM_NAME}_em.tpr
 $GMX mdrun -deffnm ${SYSTEM_NAME}_em
-
 
 # Make a topology/coordinates pair for the entire molecule
 cp ${SYSTEM_NAME}.top ${SYSTEM_NAME}.itp

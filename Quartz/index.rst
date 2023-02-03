@@ -5,7 +5,7 @@ To construct coordinates for a slab of SiO2, we will need (1) coordinates for a 
 
     .. code-block:: text
 
-        [ SiO ]
+        [ Q011 ]
         ; 
         [ atoms ]
             SI1     SIH3  0.8000   0
@@ -107,34 +107,43 @@ For the topology file below, the following special bonds are needed:
 
     .. code-block:: text
 
-        SiO     SI1     1       SiO     O17     1       0.16    SiO     SiO
-        SiO     SI4     1       SiO     O8      1       0.26    SiO     SiO
-        SiO     SI4     1       SiO     O12     1       0.16    SiO     SiO
-        SiO     SI22    1       SiO     O6      1       0.26    SiO     SiO
-        SiO     SI22    1       SiO     O18     1       0.16    SiO     SiO
-        SiO     SI23    1       SiO     O7      1       0.26    SiO     SiO
-        SiO     SI25    1       SiO     O9      1       0.16    SiO     SiO
-        SiO     SI25    1       SiO     O33     1       0.30    SiO     SiO
-        SiO     SI27    1       SiO     O30     1       0.18    SiO     SiO
-        SiO     SI27    1       SiO     O35     1       0.16    SiO     SiO
-        SiO     SI28    1       SiO     O31     1       0.18    SiO     SiO
+        Q011    SI1     1       Q011    O17     1       0.16    Q011    Q011
+        Q011    SI4     1       Q011    O8      1       0.16    Q011    Q011
+        Q011    SI4     1       Q011    O12     1       0.16    Q011    Q011
+        Q011    SI22    1       Q011    O6      1       0.16    Q011    Q011
+        Q011    SI22    1       Q011    O18     1       0.16    Q011    Q011
+        Q011    SI23    1       Q011    O7      1       0.16    Q011    Q011
+        Q011    SI25    1       Q011    O9      1       0.16    Q011    Q011
+        Q011    SI25    1       Q011    O33     1       0.16    Q011    Q011
+        Q011    SI27    1       Q011    O30     1       0.16    Q011    Q011
+        Q011    SI27    1       Q011    O35     1       0.16    Q011    Q011
+        Q011    SI28    1       Q011    O31     1       0.16    Q011    Q011
 
-Note, that if these bonds are added on top of those listed in the topology file above, all the atoms are saturated with covalent bonds: all the silicone atoms have four bonds in total, all oxygens --- two. Also note, that somme of the target distances are quite far off from the forcefield target distance of 0.1698 nm (see the bond between atom types ``SI`` and ``OSIE`` in ``ffbonded.itp`` file of the forcefield). These distances are taken from the slab structure and used here to make sure that corresponding bonds will be added (i.e. will be within the 10% margin of the distance). Afterwards, the energy minimization algorithm should pull the respective atoms closer to one another or push them farther apart.
+Note, that if these bonds are added on top of those listed in the topology file above, all the atoms are saturated with covalent bonds: all the silicone atoms have four bonds in total, all oxygens --- two.
 
     .. code-block:: shell
 
+        # Set variables
         GMX=/usr/local/gromacs/bin/gmx
-        SYSTEM_NAME=slab
+        NX=10
+        NY=10
+        SYSTEM_NAME=slab_${NX}x${NY}
         FFHOME=~/git/artemzhmurov/charmm36
         PETROLMD=~/git/artemzhmurov/petrolmd
+
+        # Create coordinates file for the slab
+        ${PETROLMD}/build/Quartz/create_quartz ${PETROLMD}/Quartz/files/input.xyz ${PETROLMD}/Quartz/files/crystal.dat ${SYSTEM_NAME}.gro no ${NX} ${NY} 200.0
+
+        # Create topology and minimize the structure
         cp ${FFHOME}/specbond.dat .
         cp ${PETROLMD}/files/em_vac.mdp em.mdp
-        ${PETROLMD}/build/Quartz/create_quartz
         $GMX pdb2gmx -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -ff charmm36 -water tip3p
         $GMX editconf -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -d 0.1
         $GMX editconf -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -box 100 100 100 -noc
         $GMX grompp -f em.mdp -c ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -o ${SYSTEM_NAME}_em.tpr
         $GMX mdrun -deffnm ${SYSTEM_NAME}_em
+
+        # Make a topology/coordinates pair for the entire molecule
         cp ${SYSTEM_NAME}.top ${SYSTEM_NAME}.itp
         sed -i -n '/\[ moleculetype \]/,$p' ${SYSTEM_NAME}.itp
         sed -i '/; Include Position restraint file/,$d' ${SYSTEM_NAME}.itp
@@ -145,7 +154,9 @@ Note, that if these bonds are added on top of those listed in the topology file 
         cp ${SYSTEM_NAME}_em.gro coord/${SYSTEM_NAME}.gro
         cp ${PETROLMD}/Quartz/files/sislab.top ${SYSTEM_NAME}.top
         sed -i "s/NEWMOLECULENAME/${SYSTEM_NAME}/g" ${SYSTEM_NAME}.top
-        $GMX editconf -f coord/${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -box 5 5 5 -noc
+
+        # Run test simulations
+        $GMX editconf -f coord/${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -box 10 10 10 -noc
         $GMX solvate -cp ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top
         cp ${PETROLMD}/files/mdp-charmm36/*.mdp .
         $GMX grompp -f em.mdp -c ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top -o em.tpr
@@ -155,24 +166,41 @@ Note, that if these bonds are added on top of those listed in the topology file 
         $GMX grompp -f npt.mdp -c nvt.gro -p ${SYSTEM_NAME}.top -o npt.tpr
         $GMX mdrun -deffnm npt -update gpu
         $GMX grompp -f md_iso.mdp -c npt.gro -p ${SYSTEM_NAME}.top -o md_iso.tpr
-        $GMX mdrun -deffnm md_iso -update gpu
+        $GMX mdrun -deffnm md_iso -update gpu -nsteps 500000
 
 Use periodic boundary conditions
 --------------------------------
 
-One drawback of using pdb2gmx in conjunction with the speccial bonds listings is that it does not take into account periodic boundary conditions. This means that using this tooling we can not construct an ``infinite`` slab, conected to itself covalently through the periodic boundary. One way would be to add this functionality to ``pdb2gmx`` (see patch in this discussion ), but we can use the folowing trick instead.
+One drawback of using pdb2gmx in conjunction with the special bonds listings is that it does not take into account periodic boundary conditions. This means that using this tooling we can not construct an ``infinite`` slab, conencted to itself covalently through the periodic boundary. One way would be to add this functionality to ``pdb2gmx`` (see patch in `this discussion <https://gromacs.bioexcel.eu/t/infinite-dna-across-boundary-conditions/1628>`_), but we can use the following trick instead.
 
 The bonds within residue (within one unit) are added regardless of periodic boundary. Hence, if we will can move our slab molecule so that the periodic boundary goes through the molecule, instead of going through the special bonds connections. This way ``pdb2gmx`` will compute the interatomic distances correctly, thus adding the special bonds. Note that it will complain about some of the bonds being too long (these that will happen to be across the periodic boundary). It will not matter is simulations, where the periodic boundary conditions are taken into account. That is if the PBC are set correctly in the simulations.
 
     .. code-block:: shell
 
+        # Set variables
         GMX=/usr/local/gromacs/bin/gmx
         NX=10
         NY=10
         SYSTEM_NAME=slab_${NX}x${NY}
         FFHOME=~/git/artemzhmurov/charmm36
         PETROLMD=~/git/artemzhmurov/petrolmd
-        ${PETROLMD}/build/Quartz/create_quartz ${PETROLMD}/Quartz/files/input.xyz ${PETROLMD}/Quartz/files/crystal.dat ${SYSTEM_NAME}.gro yes 10 10 200.0
+
+        # Create coordinates file for the slab
+        ${PETROLMD}/build/Quartz/create_quartz ${PETROLMD}/Quartz/files/input.xyz ${PETROLMD}/Quartz/files/crystal.dat ${SYSTEM_NAME}.gro yes ${NX} ${NY} 100.0
+
+        # Make a topology/coordinates pair for the entire molecule
+        cp ${SYSTEM_NAME}.top ${SYSTEM_NAME}_PBC.itp
+        sed -i -n '/\[ moleculetype \]/,$p' ${SYSTEM_NAME}_PBC.itp
+        sed -i '/; Include Position restraint file/,$d' ${SYSTEM_NAME}_PBC.itp
+        sed -i "s/Other/${SYSTEM_NAME}/g" ${SYSTEM_NAME}_PBC.itp
+        mkdir toppar
+        cp ${SYSTEM_NAME}.itp toppar/${SYSTEM_NAME}_PBC.itp
+        mkdir coord
+        cp ${SYSTEM_NAME}_em.gro coord/${SYSTEM_NAME}_PBC.gro
+        cp ${PETROLMD}/Quartz/files/sislab.top ${SYSTEM_NAME}_PBC.top
+        sed -i "s/NEWMOLECULENAME/${SYSTEM_NAME}_PBC/g" ${SYSTEM_NAME}_PBC.top
+
+        # Run test simulations
         cp ${FFHOME}/specbond.dat .
         $GMX pdb2gmx -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -ff charmm36 -water tip3p
         $GMX solvate -cp ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top
