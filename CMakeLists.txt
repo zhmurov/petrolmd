@@ -4,6 +4,7 @@ project(MDScripts LANGUAGES CXX)
 
 add_subdirectory(CreateAlkanesTraPPE-UA)
 add_subdirectory(CreateAlkanesCHARMM)
+add_subdirectory(Benzene)
 add_subdirectory(CountNumMolecules)
 add_subdirectory(Quartz)
 add_subdirectory(Analysis)
