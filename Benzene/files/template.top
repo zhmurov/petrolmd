@@ -1,0 +1,13 @@
+; Include forcefield parameters
+#include "charmm36.ff/forcefield.itp"
+#include "charmm36.ff/tip3p.itp"
+#include "charmm36.ff/ions.itp"
+#include "toppar/NEWMOLECULENAME.itp"
+
+[ system ]
+; Name
+NEWMOLECULENAME
+
+[ molecules ]
+; Compound     #mols
+NEWMOLECULENAME      1
