@@ -1,0 +1,11 @@
+; Include forcefield parameters
+#include "trappeua.ff/forcefield.itp"
+#include "trappeua.ff/tip4p.itp"
+
+[ system ]
+; Name
+single tip4p molecule
+
+[ molecules ]
+; Compound     #mols
+SOL      1
