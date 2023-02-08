@@ -17,8 +17,8 @@ $GMX grompp -f em.mdp -c ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -o ${SYSTEM_NA
 $GMX mdrun -deffnm ${SYSTEM_NAME}_em
 mkdir coord
 cp ${SYSTEM_NAME}_em.gro coord/${SYSTEM_NAME}.gro
-$GMX editconf -f ${SYSTEM_NAME}_em.gro -o ${SYSTEM_NAME}.pdb
-cp ${SYSTEM_NAME}.pdb coord/${SYSTEM_NAME}.pdb
+$GMX editconf -f ${SYSTEM_NAME}_em.gro -o ${SYSTEM_NAME}_em.pdb
+cp ${SYSTEM_NAME}_em.pdb coord/${SYSTEM_NAME}.pdb
 
 # Make a topology for the molecule
 cp ${SYSTEM_NAME}.top ${SYSTEM_NAME}.itp
