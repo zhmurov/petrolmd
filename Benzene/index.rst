@@ -139,6 +139,44 @@ Hence, the resulting (energy minimized) structure will be saved as `${SYSTEM_NAM
         mkdir coord
         cp ${SYSTEM_NAME}_em.gro coord/${SYSTEM_NAME}.gro
 
+Current `.top` file does two things at the same time: it describes the composition of the entire molecular system and topology of a single benzene molecule.
+This is not surprising because our system is singular benzene molecule.
+However, this is not convenient if we want to re-use the molecular topology description part of the file when benzene molecule(s) is(are) part of another molecular system.
+What we can do in this case is we can create a separate `.itp` file and copy the topology description there.
+The part we need to keep starts with `[ moleculetype ]` and ends after `[ dihedrals ]` section of the topology file.
+By default, the molecule is named `Other`, which can also be changed for convenience (and should be change to avoid duplicating names).
+The described procedures can be performed with the following script:
+
+    .. code-block:: bash
+
+        cp ${SYSTEM_NAME}.top ${SYSTEM_NAME}.itp
+        sed -i -n '/\[ moleculetype \]/,$p' ${SYSTEM_NAME}.itp
+        sed -i '/; Include Position restraint file/,$d' ${SYSTEM_NAME}.itp
+        sed -i "s/Other/${SYSTEM_NAME}/g" ${SYSTEM_NAME}.itp
+        mkdir toppar
+        cp ${SYSTEM_NAME}.itp toppar/${SYSTEM_NAME}.itp
+
+Now, the system topology can just include the molecular topology file.
+For the system of a singular benzene, the topology will be:
+
+    .. code-block:: text
+
+        ; Include forcefield parameters
+        #include "charmm36.ff/forcefield.itp"
+        #include "toppar/C6H6.itp"
+
+        [ system ]
+        ; Name
+        C6H6
+
+        [ molecules ]
+        ; Compound     #mols
+        C6H6      1
+
+Creating topologies and coordinates for all the molecules of the mixture allow to re-use them in the future, thus simplifying the process of simulating the arbitrary mixture significantly.
+The coordinates file can be constructed using pre-generated coordinate files for the molecules (e.g. using Packmol software) and the topologies of molecules should be included into the system topology file.
+These two files should be kept in-sync though, with the number of molecules and their order in coordinates file strictly correspondent to the number of molecules and their order in the system topology.
+
 The .mdp file
 -------------
 
