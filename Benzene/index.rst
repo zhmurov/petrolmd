@@ -160,6 +160,14 @@ Hence, the resulting (energy minimized) structure will be saved as ``${SYSTEM_NA
         mkdir coord
         cp ${SYSTEM_NAME}_em.gro coord/${SYSTEM_NAME}.gro
 
+Some software packages may need a ``.pdb`` file instead of ``.gro``.
+To convert, one can use ``editconf`` utility from GROMACS:
+
+    .. code-block:: bash
+
+        $GMX editconf -f ${SYSTEM_NAME}_em.gro -o ${SYSTEM_NAME}.pdb
+        cp ${SYSTEM_NAME}.pdb coord/${SYSTEM_NAME}.pdb
+
 The .mdp file
 -------------
 
