@@ -2,8 +2,8 @@ Create topology and coordinates for benzene molecule
 ====================================================
 
 For the molecular system that contains a mixture of small molecules it is convenient to have topology and coordinate files for each component.
-This way the system coordinates can be created by a third-party software (e.g. Packmol) and the topology file will list the molecules and their quantities.
-We will use an example of benzene to explain the procedure.
+This way the system coordinates can be created by a third-party software (e.g. Packmol or VMD) and the topology file will just list the molecules and their quantities, not the interatomic connectivity in the molecules.
+We will use an example of benzene to explain the procedure of creating a pair of coordinates and topology files for a single molecule that can be later used when the molecule is added to the mixture of many molecules.
 
 The coordinates
 ---------------
@@ -51,6 +51,7 @@ Let us use CHARMM 36 force-field for the reference. If we find benzene molecule 
 These atom types are now can be used to extract equilibrium parameters for bonds and angles form `ffbonded.itp` file in the force-field. Note that we are licky that our molecule is planar and hence we do not have to think on satisfying the dihedral angles. The parameters that we are looking for are in the following lines of the `ffbonded.itp` file:
 
     .. code-block:: text
+        
         ...
         CG2R61   CG2R61     1   0.13750000    255224.00 ; PROT benzene, JES 8/25/89
         ...
