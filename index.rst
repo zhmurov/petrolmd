@@ -92,6 +92,7 @@ To create the coordinates for a box of molecules, we can use Packmol software. Y
    :maxdepth: 1
    :caption: Table of contents
 
+   Benzene/index
    CreateAlkanesTraPPE-UA/index
    CreateAlkanesCHARMM/index
    Quartz/index
