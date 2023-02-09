@@ -1,19 +1,15 @@
 Linear hydrocarbons (alkanes) 
 =============================
 
+The aim of this section is to create coordinates and molecular topologies for all alkanes that may be found in the mixture.
+Likely there are some already present in the force-field and these will be used as a source of parameters and atom types.
+
 Coordinates
 -----------
 
-Topology
---------
+Alkanes are chains of carbon atoms saturated with hydrogens.
 
-In case with benzene molecule we were lucky since there was a residue topology that we used to create a molecular topology for the molecule.
-Alkanes are a chain of carbon atoms saturated with hydrogens.
-All carbons are the same apart from the first one.
-
-
-To get an idea on what atom types and parameters to use, let us look at ``ethers.rtp`` file.
-The very first residue there is ``BUTA`` (butane), which should be a good template for the rest of the alkanes.
+Let us first look at the butane topology file to extract all the necessary parameters for the geometry of alkanes.
 
     .. code-block:: text
 
@@ -48,6 +44,77 @@ The very first residue there is ``BUTA`` (butane), which should be a good templa
             H41    C4
             H42    C4
             H43    C4
+
+Let us start with carbon atoms.
+The first and last carbons are of type ``CC33A`` and have a partial charge -0.27.
+This type is a carbon, that is covalently linked to one other carbon and three hydrogens.
+The rest of carbons have type ``CC32A`` and partial charge of -0.18.
+These are linked to two other carbons in the chain and have two hydrogens attached to them.
+
+The hydrogens that are connected to the first and last carbon are of type ``HCA3A``, the rest are of type ``HCA2A``.
+All hydrogens have partial charge of 0.9, which makes the total charge of the molecule zero.
+
+Let us check the bonded parameters for these atom types in ``ffbonded.itp`` file.
+We are interested in equilibrium bond distances and angles, since we are going to use these parameters when constructing the coordinates of the molecule.
+Corresponding lines for bond distances in ``ffbonded.itp`` file are:
+
+    .. code-block:: text
+
+        [ bondtypes ]
+        ...
+        ;      i        j  func           b0           kb
+        ...
+        CC32A    HCA2A     1   0.11110000    258571.20 ; alkanes, 4/98
+        CC33A    HCA3A     1   0.11110000    269449.60 ; alkanes, 4/98
+        ...
+        CC32A    CC32A     1   0.15300000    186188.00 ; alkanes, 3/92
+        CC32A    CC33A     1   0.15280000    186188.00 ; alkanes, 3/92
+        CC33A    CC33A     1   0.15300000    186188.00 ; alkanes, 3/92
+        ...
+
+Each line here contains parameters for one type of bond.
+The later is defined by the atom types that participate in this bond, which are in the first two columns.
+These are followed by the function type (1 for harmonic bond), equilibrium distance (``b0``) and spring constant (``kb``).
+Most of the entries also have a comment which indicates where the parameters are taken from.
+
+Here, we see that the equilibrium distances for C-H bonds are the same for two cases we have: 0.1111 nm.
+There is a slight variation in C-C bond distances, with bonds at the terminals of the molecule slightly lower in length.
+For simplicity, we are going to use the same value of 0.153 nm for all of these and will let the energy minimization algorithm to fix this small inconsistency.
+
+The parameters for equilibrium bond angles can be taken from the following lines in ``ffbonded.itp`` file:
+
+    .. code-block:: text
+
+        [ angletypes ]
+        ...
+        ;      i        j        k  func       theta0       ktheta          ub0          kub
+
+        ...
+        HCA2A    CC32A    CC32A     5   110.100000   221.752000   0.21790000     18853.10 ; alkane, 4/98
+        HCA2A    CC32A    CC33A     5   110.100000   289.532800   0.21790000     18853.10 ; alkane, 4/98
+        ...
+        HCA3A    CC33A    CC33A     5   110.100000   313.800000   0.21790000     18853.10 ; alkane, 4/98
+        HCA2A    CC32A    HCA2A     5   109.000000   297.064000   0.18020000      4518.72 ; alkane, 3/92
+        HCA3A    CC33A    HCA3A     5   108.400000   297.064000   0.18020000      4518.72 ; alkane, 3/92
+        ...
+        CC32A    CC32A    CC32A     5   113.600000   488.272800   0.25610000      9338.69 ; alkane, 3/92
+        ...
+        CC32A    CC32A    CC33A     5   115.000000   485.344000   0.25610000      6694.40 ; alkane, 3/92
+
+To get the geometrical parameters of a chain
+
+Topology
+--------
+
+In case with benzene molecule we were lucky since there was a residue topology that we used to create a molecular topology for the molecule.
+
+All carbons are the same apart from the first one.
+
+
+To get an idea on what atom types and parameters to use, let us look at ``ethers.rtp`` file.
+The very first residue there is ``BUTA`` (butane), which should be a good template for the rest of the alkanes.
+
+
 
 
     .. code-block:: text
