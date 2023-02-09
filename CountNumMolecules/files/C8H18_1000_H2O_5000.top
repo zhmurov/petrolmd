@@ -1,0 +1,13 @@
+; Include forcefield parameters
+#include "charmm36.ff/forcefield.itp"
+#include "charmm36.ff/tip3p.itp"
+#include "toppar/C8H18.itp"
+
+[ system ]
+; Name
+1000 octane molecules in water
+
+[ molecules ]
+; Compound        #mols
+C8H18             1000
+SOL               5000
