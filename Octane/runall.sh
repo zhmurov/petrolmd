@@ -11,8 +11,8 @@ FFHOME=~/git/artemzhmurov/charmm36
 cp -r ${FFHOME}/toppar/ .
 cp -r ${FFHOME}/coord/ .
 
-cp ${PETROLMD}/CountNumMolecules/files/*.inp .
-cp ${PETROLMD}/CountNumMolecules/files/*.top .
+cp ${PETROLMD}/Octane/files/*.inp .
+cp ${PETROLMD}/Octane/files/*.top .
 cp ${PETROLMD}/files/mdp-charmm36/* .
 
 $PACKMOL < ${SYSTEM_NAME}.inp
