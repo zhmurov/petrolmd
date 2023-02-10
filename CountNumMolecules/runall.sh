@@ -4,7 +4,7 @@
 GMX=/usr/local/gromacs/bin/gmx
 PACKMOL=~/git/external/packmol/packmol
 
-SYSTEM_NAME=C8H18_solv
+SYSTEM_NAME=octane_solv2
 PETROLMD=~/git/artemzhmurov/petrolmd
 FFHOME=~/git/artemzhmurov/charmm36
 

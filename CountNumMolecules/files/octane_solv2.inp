@@ -1,6 +1,6 @@
 tolerance 2.0
 filetype pdb
-output C8H18_solv.pdb
+output octane_solv.pdb
 
 structure coord/C8H18.pdb
 number 100 

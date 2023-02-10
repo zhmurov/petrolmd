@@ -7,17 +7,17 @@ System coordinates
 To create the system, we will use Packmol software.
 Packmol takes coordinates of a single molecule and fills the specified volume with translated and rotated copies of the molecule.
 We assume that there is a ``coord`` folder with coordinates of single molecules that can be used to create a mixture.
-To create a 10nm x 10nm x 10nm box containing 1000 octane molecules with Packmol, create ``C8H18_1000_Packmol.inp`` file with the following:
+To create a 10nm x 10nm x 10nm box containing 1000 octane molecules with Packmol, create ``octane.inp`` file with the following:
 
     .. code-block:: text
 
         tolerance 2.0
         filetype pdb
-        output C8H18_1000.pdb
+        output octane.pdb
 
         structure coord/C8H18.pdb
-        number 1000 
-        inside box 0. 0. 0. 100. 100. 100. 
+        number 100
+        inside box 0. 0. 0. 40. 40. 40. 
         end structure
 
 The first three lines specify the output parameters.
@@ -29,9 +29,9 @@ To create the PDB file with Packmol, feed the created file to the software:
 
     .. code-block:: shell
     
-        $PACKMOL < C8H18_1000_Packmol.inp
+        $PACKMOL < octane.inp
 
-This should create a ``C8H18_1000.pdb`` file. Feel free to load it into VMD or other visualization software to have a look.
+This should create a ``octane.pdb`` file. Feel free to load it into VMD or other visualization software to have a look.
 
 System topology
 ---------------
@@ -65,8 +65,8 @@ To add water using GROMACS, create ``.gro`` file with solvation box specified an
 
     .. code-block:: shell
     
-        $GMX editconf -f C8H18_1000.pdb -o C8H18_1000_box.gro -box 10 10 10
-        $GMX solvate -cp C8H18_1000_box.gro -o C8H18_1000_solv.gro -p C8H18_1000.top
+        $GMX editconf -f octane.pdb -o octane_box.gro -box 10 10 10
+        $GMX solvate -cp octane_box.gro -o octane_solv.gro -p octane.top
 
     This will specify the box size to 10nm x 10nm x 10nm and add as many water molecules as it will be able to without introducing steric clashes between molecules and without exceeding normal density.
     You can also specify maximum number of water molecules by adding ``--maxsol`` parameter to ``gmx solvate``.
@@ -82,7 +82,7 @@ To mix 1000 octane molecules with 5000 water molecules, one can use the followin
 
         tolerance 2.0
         filetype pdb
-        output C8H18_1000_solv.pdb
+        output octane_solv.pdb
 
         structure coord/C8H18.pdb
         number 1000 
@@ -98,7 +98,7 @@ You will still need to run ``gmx editconf`` to specify the box size:
 
     .. code-block:: shell
     
-        $GMX editconf -f C8H18_1000_solv.pdb -o C8H18_1000_solv.gro -box 10 10 10
+        $GMX editconf -f octane_solv.pdb -o octane_solv.gro -box 10 10 10
 
 The corresponding topology file will be:
 
@@ -128,7 +128,7 @@ This is done by providing different compartments to Packmol:
 
         tolerance 2.0
         filetype pdb
-        output C8H18_1000_solv.pdb
+        output octane_solv.pdb
 
         structure coord/C8H18.pdb
         number 1000 
@@ -180,7 +180,7 @@ The parameters used here are recommended parameters for CHARMM force-fields, i.e
 
     .. code-block:: shell
 
-        $GMX grompp -f em.mdp -c C8H18_1000_solv.gro -p C8H18_1000.top -o em.tpr
+        $GMX grompp -f em.mdp -c octane_solv.gro -p octane.top -o em.tpr
         $GMX mdrun -deffnm em
 
 Equilibration
@@ -240,7 +240,7 @@ To start the NVT equilibration stage, create portable simulation file (``.tpr``)
 
     .. code-block:: shell
 
-        $GMX grompp -f nvt.mdp -c em.gro -p C8H18_1000.top -o nvt.tpr
+        $GMX grompp -f nvt.mdp -c em.gro -p octane.top -o nvt.tpr
         $GMX mdrun -deffnm nvt
 
 The second equilibration stage is done under constant pressure conditions (NPT ensemble).
@@ -295,7 +295,7 @@ Now, configure and run the simulations.
 
     .. code-block:: shell
 
-        $GMX grompp -f npt.mdp -c nvt.gro -p C8H18_1000.top -o npt.tpr
+        $GMX grompp -f npt.mdp -c nvt.gro -p octane.top -o npt.tpr
         $GMX mdrun -deffnm npt
 
 
@@ -375,6 +375,6 @@ Save the ``.mdp`` file, create ``.tpr`` with ``gmx grompp`` and run the simulati
 
     .. code-block:: shell
 
-        $GMX grompp -f md.mdp -c npt.gro -p C8H18_1000.top -o md.tpr
+        $GMX grompp -f md.mdp -c npt.gro -p octane.top -o md.tpr
         $GMX mdrun -deffnm md
 
