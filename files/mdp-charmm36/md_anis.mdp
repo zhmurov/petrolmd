@@ -3,7 +3,7 @@ title                   = Equilibrium simulations
 ; Parameters describing what to do, when to stop and what to save
 integrator              = md        ; leap-frog integrator
 dt                      = 0.002     ; 2 fs
-nsteps                  = 10000000     ; 
+nsteps                  = 5000000     ; 
 
 ; periodic boundary condition
 pbc                     = xyz       ;
@@ -22,11 +22,6 @@ nstenergy                = 500     ; for writing energies to edr file
 nstxout-compressed       = 5000    ; for writing coords (x) 
 
 ; Pressure coupling is on
-; pcoupl                  = C-rescale             ; Pressure coupling on in NPT
-; pcoupltype              = isotropic             ; uniform scaling of box vectors
-; tau_p                   = 5.0                   ; time constant, in ps
-; ref_p                   = 1.0                   ; reference pressure, in bar
-; compressibility         = 4.5e-5                ; isothermal compressibility of water, bar^-1
 pcoupl                  = Parrinello-Rahman                         ; Pressure coupling on in NPT
 pcoupltype              = anisotropic                               ; non-uniform scaling of box vectors
 ref_p                   = 1.0    1.0    1.0    0.0    0.0    0.0    ; reference pressure, in bar. No shear, off-diagonal elements are zero
