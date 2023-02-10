@@ -9,5 +9,5 @@
 
 [ molecules ]
 ; Compound        #mols
-C8H18             1000
-SOL               5000
+C8H18             100
+SOL               1000
