@@ -33,6 +33,7 @@ Optionally, one can set the installation path by adding ``-DCMAKE_INSTALL_PREFIX
 
         GMX=/usr/local/gromacs/bin/gmx
 
+
 Force-field and additional software:
 ====================================
 
@@ -87,6 +88,17 @@ To create the coordinates for a box of molecules, we can use Packmol software. Y
         PACKMOL=$(pwd)/packmol
 
 
+Codes in this project
+=====================
+
+    .. code-block:: shell
+
+        git clone git@gitlab.com:artemzhmurov/petrolmd.git
+        cd petrolmd
+        cmake -S. -Bbuild
+        cmake --build build
+        PETROLMD=${pwd}
+
 
 .. toctree::
    :maxdepth: 1
@@ -95,5 +107,5 @@ To create the coordinates for a box of molecules, we can use Packmol software. Y
    Benzene/index
    CreateAlkanesTraPPE-UA/index
    CreateAlkanesCHARMM/index
-   CountNumMolecules/index
+   Octane/index
    Quartz/index

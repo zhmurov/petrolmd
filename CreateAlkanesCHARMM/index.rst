@@ -1,3 +1,85 @@
+Linear hydrocarbons (alkanes) 
+=============================
+
+Coordinates
+-----------
+
+Topology
+--------
+
+In case with benzene molecule we were lucky since there was a residue topology that we used to create a molecular topology for the molecule.
+Alkanes are a chain of carbon atoms saturated with hydrogens.
+All carbons are the same apart from the first one.
+
+
+To get an idea on what atom types and parameters to use, let us look at ``ethers.rtp`` file.
+The very first residue there is ``BUTA`` (butane), which should be a good template for the rest of the alkanes.
+
+    .. code-block:: text
+
+        [ BUTA ]
+        ; butane
+        [ atoms ]
+            H11    HCA3A  0.0900   1
+            H12    HCA3A  0.0900   1
+            H13    HCA3A  0.0900   1
+            C1    CC33A -0.2700   1
+            H21    HCA2A  0.0900   2
+            H22    HCA2A  0.0900   2
+            C2    CC32A -0.1800   2
+            H31    HCA2A  0.0900   3
+            H32    HCA2A  0.0900   3
+            C3    CC32A -0.1800   3
+            H41    HCA3A  0.0900   4
+            H42    HCA3A  0.0900   4
+            H43    HCA3A  0.0900   4
+            C4    CC33A -0.2700   4
+        [ bonds ]
+            H11    C1
+            H12    C1
+            H13    C1
+            C1    C2
+            H21    C2
+            H22    C2
+            C2    C3
+            H31    C3
+            H32    C3
+            C3    C4
+            H41    C4
+            H42    C4
+            H43    C4
+
+
+    .. code-block:: text
+
+        ; Methylene group in the middle of an alkane
+        [ CH2 ]
+        [ atoms ]
+            C      CC32A -0.1800   1
+            H1     HCA2A  0.0900   1
+            H2     HCA2A  0.0900   1
+        [ bonds ]
+        C     H1
+        C     H2
+        -C     C
+        C    +C
+
+    .. code-block:: text
+
+        ; Terminal methyl group for an alkane
+        [ CH3 ]
+        [ atoms ]
+            C      CC33A -0.2700   1
+            H1     HCA3A  0.0900   1
+            H2     HCA3A  0.0900   1
+            H3     HCA3A  0.0900   1
+        [ bonds ]
+        C     H1
+        C     H2
+        C     H3
+        -C     C
+
+
 Create topologies and coordinates for the alkanes in CHARMM36
 -------------------------------------------------------------
 

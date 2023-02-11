@@ -4,7 +4,7 @@ GROMACS simulations of a box of 1000 octane molecules
 Building the system
 ^^^^^^^^^^^^^^^^^^^
 
-1. Get the PDB file for octane molecule, e.g. from the output of ``reate_alkanes`` script above. You can also find coordinates online, for instance `here <https://www.angelo.edu/faculty/kboudrea/molecule_gallery/01_alkanes/00_alkanes.htm>`_.
+1. Get the PDB file for octane molecule, e.g. from the output of ``create_alkanes`` script above. You can also find coordinates online, for instance `here <https://www.angelo.edu/faculty/kboudrea/molecule_gallery/01_alkanes/00_alkanes.htm>`_.
 
 2. Create topology file for a single molecule:
     
@@ -139,98 +139,98 @@ Creating alkanes
 Building the helper codes
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    git clone git@gitlab.com:artemzhmurov/petrolmd.git
-    cd petrolmd
-    cmake -S. -Bbuild
-    cmake --build build
-    PETROLMD=${pwd}
+        git clone git@gitlab.com:artemzhmurov/petrolmd.git
+        cd petrolmd
+        cmake -S. -Bbuild
+        cmake --build build
+        PETROLMD=${pwd}
 
 Create PDB files
 ^^^^^^^^^^^^^^^^
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    mkdir toppar
-    cd toppar
-    ${PETROLMD}/build/CreateAlkanesTraPPE-UA/create_alkanes
+        mkdir toppar
+        cd toppar
+        ${PETROLMD}/build/CreateAlkanesTraPPE-UA/create_alkanes
 
 Copy additional files, e.g. iso-butane and iso-pentane pdbs (see ``files/PDBs`` folder in this repo):
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    cp ${PETROLMD}/CreateAlkanesTraPPE-UA/files/PDBs/C4H10_ISO.pdb .
-    cp ${PETROLMD}/CreateAlkanesTraPPE-UA/files/PDBs/C5H12_ISO.pdb .
+        cp ${PETROLMD}/CreateAlkanesTraPPE-UA/files/PDBs/C4H10_ISO.pdb .
+        cp ${PETROLMD}/CreateAlkanesTraPPE-UA/files/PDBs/C5H12_ISO.pdb .
 
 Make topologies
 ^^^^^^^^^^^^^^^
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    bash ${PETROLMD}/CreateAlkanesTraPPE-UA/create_topologies.sh
+        bash ${PETROLMD}/CreateAlkanesTraPPE-UA/create_topologies.sh
 
 This will create ``.itp`` files for all the coordinates that we have in the folder. You will also need coordinates for the water molecule:
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    cp ${PETROLMD}/files/tip4p.gro .
-    cd ..
+        cp ${PETROLMD}/files/tip4p.gro .
+        cd ..
 
 It is convenient to save the system name and box sizes into variables, so scripts below can be copy-pasted:
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    Lx=<Lx(nm)>
-    Ly=<Ly(nm)>
-    Lz=<Lz(nm)>
-    SYSTEM_NAME=<system_name>
+        Lx=<Lx(nm)>
+        Ly=<Ly(nm)>
+        Lz=<Lz(nm)>
+        SYSTEM_NAME=<system_name>
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    ${PETROLMD}/build/CountNumMolecules/count_mols ${PETROLMD}/CountNumMolecules/files/atomic_weights.dat ${PETROLMD}/CountNumMolecules/files/<composition_data>.dat ${SYSTEM_NAME} ${Lx} ${Ly} ${Lz}
+        ${PETROLMD}/build/CountNumMolecules/count_mols ${PETROLMD}/CountNumMolecules/files/atomic_weights.dat ${PETROLMD}/CountNumMolecules/files/<composition_data>.dat ${SYSTEM_NAME} ${Lx} ${Ly} ${Lz}
 
 This will produce two files: topology for GROMACS and input file for packmol. To create coordinates file, use:
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    $PACKMOL < ${SYSTEM_NAME}_packmol.inp
+        $PACKMOL < ${SYSTEM_NAME}_packmol.inp
 
 You should be good to go for GROMACS simulation. You can use provided ``.mdp`` files for energy minimization. equilibration and production runs:
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    cp ${PETROLMD}/files/*.mdp .
+        cp ${PETROLMD}/files/*.mdp .
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    $GMX editconf -f ${SYSTEM_NAME}.pdb -o ${SYSTEM_NAME}_box.gro -box ${Lx} ${Ly} ${Lz}
-    $GMX solvate -cp ${SYSTEM_NAME}_box.gro -cs toppar/tip4p.gro -o ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top
-    $GMX grompp -f em.mdp -c ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top -o em.tpr
-    $GMX mdrun -deffnm em
-    $GMX grompp -f nvt.mdp -c em.gro -p ${SYSTEM_NAME}.top -o nvt.tpr
-    $GMX mdrun -deffnm nvt
-    $GMX grompp -f npt.mdp -c nvt.gro -p ${SYSTEM_NAME}.top -o npt.tpr
-    $GMX mdrun -deffnm npt
-    $GMX grompp -f md.mdp -c npt.gro -p ${SYSTEM_NAME}.top -o md.tpr
-    $GMX mdrun -deffnm md
+        $GMX editconf -f ${SYSTEM_NAME}.pdb -o ${SYSTEM_NAME}_box.gro -box ${Lx} ${Ly} ${Lz}
+        $GMX solvate -cp ${SYSTEM_NAME}_box.gro -cs toppar/tip4p.gro -o ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top
+        $GMX grompp -f em.mdp -c ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top -o em.tpr
+        $GMX mdrun -deffnm em
+        $GMX grompp -f nvt.mdp -c em.gro -p ${SYSTEM_NAME}.top -o nvt.tpr
+        $GMX mdrun -deffnm nvt
+        $GMX grompp -f npt.mdp -c nvt.gro -p ${SYSTEM_NAME}.top -o npt.tpr
+        $GMX mdrun -deffnm npt
+        $GMX grompp -f md.mdp -c npt.gro -p ${SYSTEM_NAME}.top -o md.tpr
+        $GMX mdrun -deffnm md
 
 Example script:
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    ${PETROLMD}/build/CountNumMolecules/count_mols ${PETROLMD}/CountNumMolecules/files/atomic_weights.dat ${PETROLMD}/CountNumMolecules/files/methane-octane.dat methane-octane 10.0 10.0 10.0
-    $PACKMOL < methane-octane_packmol.inp
-    $GMX editconf -f methane-octane.pdb -o methane-octane_box.gro -box 10 10 10
-    $GMX solvate -cp methane-octane_box.gro -cs toppar/tip4p.gro -o methane-octane_solv.gro -p methane-octane.top
-    $GMX grompp -f em.mdp -c methane-octane_solv.gro -p methane-octane.top -o em.tpr
-    $GMX mdrun -deffnm em
-    $GMX grompp -f nvt.mdp -c em.gro -p methane-octane.top -o nvt.tpr
-    $GMX mdrun -deffnm nvt
-    $GMX grompp -f npt.mdp -c nvt.gro -p methane-octane.top -o npt.tpr
-    $GMX mdrun -deffnm npt
-    $GMX grompp -f md.mdp -c npt.gro -p methane-octane.top -o md.tpr
-    $GMX mdrun -deffnm md
+        ${PETROLMD}/build/CountNumMolecules/count_mols ${PETROLMD}/CountNumMolecules/files/atomic_weights.dat ${PETROLMD}/CountNumMolecules/files/methane-octane.dat methane-octane 10.0 10.0 10.0
+        $PACKMOL < methane-octane_packmol.inp
+        $GMX editconf -f methane-octane.pdb -o methane-octane_box.gro -box 10 10 10
+        $GMX solvate -cp methane-octane_box.gro -cs toppar/tip4p.gro -o methane-octane_solv.gro -p methane-octane.top
+        $GMX grompp -f em.mdp -c methane-octane_solv.gro -p methane-octane.top -o em.tpr
+        $GMX mdrun -deffnm em
+        $GMX grompp -f nvt.mdp -c em.gro -p methane-octane.top -o nvt.tpr
+        $GMX mdrun -deffnm nvt
+        $GMX grompp -f npt.mdp -c nvt.gro -p methane-octane.top -o npt.tpr
+        $GMX mdrun -deffnm npt
+        $GMX grompp -f md.mdp -c npt.gro -p methane-octane.top -o md.tpr
+        $GMX mdrun -deffnm md
 
 
 
@@ -276,6 +276,7 @@ At this stage, we need to manually edit the configuration file for packmol to se
 Now we need to transfer coordinates of the water molecules from the pre-generated water box into our system. The former are in the ``out.gro`` file, the later - in the ``${SYSTEM_NAME}_solv.gro`` file. Since we imposed the limit on the number of solvent molecules in both cases and assuming that this number was reached, it should be the same in both cases.
 
     .. code-block:: shell
+
         top2psf ${SYSTEM_NAME}.top toppar/ ${SYSTEM_NAME}.psf
         $GMX grompp -f em.mdp -c ${SYSTEM_NAME}_solv.gro -p ${SYSTEM_NAME}.top -o em.tpr
         $GMX mdrun -deffnm em
