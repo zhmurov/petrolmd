@@ -49,17 +49,20 @@ Get the forcefield and make it available to GROMACS. Assuming that GROMACS in in
 ``pdb2gmx`` utility uses enumeration for the water model selection. Hence, one need the water mode to have one of the pre-defined names, which is not the case in the ``trappeua`` implementation we just downloaded. In order to use pdb2gmx later on, we now need to rename the water model file for tip4p model and change this name in the watermodels.dat file before we copy forcefield to the GROMACS installation folder:
 
     .. code-block:: shell
+
         mv trappeua/trappeua.ff/tip4p2005.itp trappeua/trappeua.ff/tip4p.itp
         sed -i 's/tip4p2005/tip4p/' trappeua/trappeua.ff/watermodels.dat
 
 Note, that the patched version of the forcefield is also available at:
 
     .. code-block:: shell
+
         git clone git@github.com:zhmurov/trappeua.git
 
 Now, copy the result to GROMACS installation folder:
 
     .. code-block:: shell
+        
         sudo cp -pr trappeua/trappeua.ff /usr/local/gromacs/share/gromacs/top/
 
 CHARMM36 forcefield
