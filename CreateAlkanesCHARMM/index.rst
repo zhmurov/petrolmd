@@ -101,7 +101,41 @@ The parameters for equilibrium bond angles can be taken from the following lines
         ...
         CC32A    CC32A    CC33A     5   115.000000   485.344000   0.25610000      6694.40 ; alkane, 3/92
 
-To get the geometrical parameters of a chain
+The first three rows here are the respective atom types, followed by the function id (5 is for urey-bradley angle with both harmonic angle and harmonic distance contribution).
+Urey-Bradley angle has three parameters: the equilibrium angle (``theta0``), angle spring constant (``ktheta``), equilibrium distance between first and third atom (``ub0``) and distance spring constant (``kub``).
+
+There is slightly more variability in angles for different atom types.
+But the angles are close enough to rely on the energy minimization to fix inconsistencies if there will be any.
+We also need to satisfy Urey-Bradley distances, but for simplicity we are going to leave that to energy minimization algorithm as well.
+
+The dihedral angles for our carbon atom types are all having the equilibrium dihedral angles of 0 or 180 degrees, which indicates that the carbon backbone structure is planar.
+Hence, we can build it in one plane, leaving e.g. z coordinates zero.
+The hydrogens are not in plane.
+The backbone hydrogens are sticking equidistantly from the plane while being apart from respective carbons in plane.
+The terminal hydrogens should form a tetrahedral with the first (last) carbon and three hydrogens in the corners.
+
+    .. code-block:: text
+
+        [ dihedraltypes ]
+        ...
+        ;      i        j        k        l  func         phi0         kphi  mult
+        ...
+        CC32A    CC32A    CC32A    CC32A     9     0.000000     0.470742     5 ; alkane, c27r klauda et al 2004
+   CC32A    CC32A    CC32A    CC32A     9     0.000000     0.395723     4 ; alkane, c27r klauda et al.2004
+   CC32A    CC32A    CC32A    CC32A     9   180.000000     0.626554     3 ; alkane, c27r klauda et al 2004
+   CC32A    CC32A    CC32A    CC32A     9     0.000000     0.269868     2 ; alkane, c27r klauda et al 2004
+
+Let us start with carbon atoms, that form a sawtooth-like structure.
+We are going to place the first carbon in (0,0,0).
+If the x is the general direction of the chain, each next carbon is going to be   :math:`r_{CC}\times\sin(\alpha_{CCC})` further away from the starting point.
+The y coordinates will be :math:`r_{CC}\times\cos(\alpha_{CCC})` for the odd atoms and zero for the even atoms, forming a sawtooth-like structure.
+Here, :math:`r_{CC}` is the equilibrium length of the covalent bond between two carbons, :math:`\alpha_{CCC}` is the equilibrium angle between two such bonds.
+
+The two hydrogens that are connected to the carbon in chain are :math:`\Delta y=r_{CH}\times\cos(\alpha_{HCH})` further away from the backbone in plane and are sticking out by :math:`\Delta z=r_{CH}\sin(\alpha_{HCH})` out of plane (in z direction).
+Note that due to the geometry of the backbone, :math:`\Delta y` should be added to the y coordinate of the respective carbon for odd carbons and subtracted for the even carbons.
+The :math:`\Delta z` should also be added and subtracted from the z coordinates of the respective carbon for the two connected hydrogens.
+
+
 
 Topology
 --------
