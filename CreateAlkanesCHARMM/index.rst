@@ -121,9 +121,9 @@ The terminal hydrogens should form a tetrahedral with the first (last) carbon an
         ;      i        j        k        l  func         phi0         kphi  mult
         ...
         CC32A    CC32A    CC32A    CC32A     9     0.000000     0.470742     5 ; alkane, c27r klauda et al 2004
-   CC32A    CC32A    CC32A    CC32A     9     0.000000     0.395723     4 ; alkane, c27r klauda et al.2004
-   CC32A    CC32A    CC32A    CC32A     9   180.000000     0.626554     3 ; alkane, c27r klauda et al 2004
-   CC32A    CC32A    CC32A    CC32A     9     0.000000     0.269868     2 ; alkane, c27r klauda et al 2004
+        CC32A    CC32A    CC32A    CC32A     9     0.000000     0.395723     4 ; alkane, c27r klauda et al.2004
+        CC32A    CC32A    CC32A    CC32A     9   180.000000     0.626554     3 ; alkane, c27r klauda et al 2004
+        CC32A    CC32A    CC32A    CC32A     9     0.000000     0.269868     2 ; alkane, c27r klauda et al 2004
 
 Let us start with carbon atoms, that form a sawtooth-like structure.
 We are going to place the first carbon in (0,0,0).
@@ -135,7 +135,13 @@ The two hydrogens that are connected to the carbon in chain are :math:`\Delta y=
 Note that due to the geometry of the backbone, :math:`\Delta y` should be added to the y coordinate of the respective carbon for odd carbons and subtracted for the even carbons.
 The :math:`\Delta z` should also be added and subtracted from the z coordinates of the respective carbon for the two connected hydrogens.
 
+The terminal carbons are connected to three hydrogens, with four atoms forming a tetrahedron.
+To simplify the geometry, we are going to assume that the axis of this tetrahedron is along the x (i.e. along the main axis of the alkane, not along the first C-C covalent bond).
+In this case, the x coordinate of all hydrogens should be a height of the tetrahedron away from the carbon atom, i.e. :math:`x = r_{CH}\sqrt\left(1-\frac{4}{3}\sin^2(\alpha_{HCH}/2)\right)`.
+If the vertex of tetrahedron is on the same z-plane as the carbon atom, its y coordinate differ by :math:`2r_{CH}\sin(\alpha_{HCH}/2)`, otherwise by :math:`r_{CH}\sin(\alpha_{HCH}/2)`. In the later case, difference on z axis is :math:`2r_{CH}\cos(\alpha_{HCH}/2)`.
+Here, :math:`r_{CH}` is the equilibrium length of the covalent bond between carbon and hydrogen, :math:`\alpha_{HCH}` is the equilibrium angle between teo C-H bonds.
 
+One other special case is a methane molecule, in which case the hydrogens are in the vertices of a `regular tetrahedron <https://en.wikipedia.org/wiki/Tetrahedron#:~:text=(Vertex%20figure),edges%2C%20and%20four%20vertex%20corners.>`_.
 
 Topology
 --------
