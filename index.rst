@@ -46,7 +46,7 @@ Get the forcefield and make it available to GROMACS. Assuming that GROMACS in in
 
         git clone https://github.com/wesbarnett/trappeua.git
 
-``pdb2gmx`` utility uses enumeration for the water model selection. Hence, one need the water mode to have one of the pre-defined names, which is not the case in the ``trappeua`` implementation we just downloaded. In order to use pdb2gmx later on, we now need to rename the water model file for tip4p model and change this name in the watermodels.dat file before we copy forcefield to the GROMACS installation folder:
+``gmx pdb2gmx`` utility uses enumeration for the water model selection. Hence, one need the water mode to have one of the pre-defined names, which is not the case in the ``trappeua`` implementation we just downloaded. In order to use pdb2gmx later on, we now need to rename the water model file for tip4p model and change this name in the watermodels.dat file before we copy forcefield to the GROMACS installation folder:
 
     .. code-block:: shell
 
