@@ -42,6 +42,8 @@ for filename in *.pdb; do
     # Configure and run GROMACS
     $GMX grompp -f em.mdp -c ${name}.gro -p ${name}.top -o ${name}_em.tpr
     $GMX mdrun -deffnm ${name}_em
+    # Rename the system in the resulting file
+    sed -i "s/Protein/${name}/g" ${name}_em.gro
     # Convert GRO to PDB
     $GMX editconf -f ${name}_em.gro -o ${name}_em.pdb
     # Copy the resulting coordinates
