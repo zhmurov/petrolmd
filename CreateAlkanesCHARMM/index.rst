@@ -242,14 +242,39 @@ These are constructed using the criteria that should be added to the beginning o
 As it follows from the column-by-column comments, GROMACS will generate harmonic bonds (type 1), Urey-Bradley angles (type 5), multiple proper dihedrals (type 9), etc. (more information on bond type is available in `GROMACS manual <https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html>`_).
 Column 5 indicates that all dihedrals will be generated, which we will see once it is done.
 
+Another corner-case to take care is the methane molecule, where 4 hydrogens are connected to the carbon atom.
+The residue description for this molecule is:
+
+    .. code-block:: text
+
+        ; Methane
+        [ CH4 ]
+        [ atoms ]
+            C      CC33A -0.3600   1
+            H1     HCA3A  0.0900   1
+            H2     HCA3A  0.0900   1
+            H3     HCA3A  0.0900   1
+            H4     HCA3A  0.0900   1
+        [ bonds ]
+            C    H1
+            C    H2
+            C    H3
+            C    H4
+
 Generate topology and run energy minimization
 ---------------------------------------------
 
+Once the coordinates and ``alkanes.rst`` files are ready, we can repeat the procedure we used for the benzene molecule.
+First, we create a full topology or the system using ``gmx pdb2gmx`` utility, then modify it, splitting out the molecular topology.
+Then we can run energy minimization in vacuum and save energy minimized coordinates in ``.gro`` and ``.pdb`` formats.
+Later is useful for third-party software, e.g. for Packmol, if we are to create a mixture of compounds.
+We can also do these procedures in bulk, if we create coordinates for alkanes of different length.
+The following script rely on properly set environment variables to define path to GROMACS and name of the molecule.
 
     .. code-block:: text
 
         # Run GROMACS to create top files for all the PDBs in the folder
-        $GMX pdb2gmx -f $filename -o ${name}.gro -p ${name}.top -i ${name}_posre.itp -ff charmm36 -water tip3p
+        $GMX pdb2gmx -f ${name}.gro -o ${name}.gro -p ${name}.top -i ${name}_posre.itp -ff charmm36 -water tip3p
         # Create a copy of the topology that can be included
         cp ${name}.top ${name}.itp
         # Remove th1e header
@@ -283,9 +308,32 @@ Generate topology and run energy minimization
 Create topologies and coordinates for the alkanes in CHARMM36
 -------------------------------------------------------------
 
-Make sure to use patched CHARMM36 forcefield from here: https://gitlab.com/artemzhmurov/charmm36 . 
+Make sure to use patched CHARMM36 forcefield from here: https://gitlab.com/artemzhmurov/charmm36 , or you patched the forcefield as it is described above (also see version of the force-field provided here).
+The script will use the code that create coordinate files for alkanes starting from CH4 up to C100H202 (you can change it in the code, see ``main.cpp`` in this folder).
+There are also pre-generated ``.pdb`` files for isobutane and isopentane, that require additional patch to the forcefield:
 
-The following will create initial coordinates for alkanes, build the topologies and minimize coordinates using GROMACS. Make sure that you change the path to GROMACS and to this repo in the script before running.
+    .. code-block:: text
+
+        ; Methyl branch connected to CH
+        [ MB ]
+        [ atoms ]
+            C1      CC33A -0.2700   1
+            H11     HCA3A  0.0900   1
+            H12     HCA3A  0.0900   1
+            H13     HCA3A  0.0900   1
+            C       CC32A -0.0900   1
+            H1      HCA2A  0.0900   1
+        [ bonds ]
+        C1    H11
+        C1    H12
+        C1    H13
+        C     C1
+        C     H1
+        -C     C
+        C     C+
+
+The following script will create initial coordinates for alkanes, build the topologies and minimize coordinates using GROMACS.
+Make sure that you change the path to GROMACS and to this repo in the script before running.
 
     .. code-block:: shell
 
