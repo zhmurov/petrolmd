@@ -8,8 +8,9 @@ Coordinates
 -----------
 
 Alkanes are chains of carbon atoms saturated with hydrogens.
-
 Let us first look at the butane topology file to extract all the necessary parameters for the geometry of alkanes.
+To get an idea on what atom types and parameters to use, let us look at ``ethers.rtp`` file.
+The very first residue there is ``BUTA`` (butane), which should be a good template for the rest of the alkanes.
 
     .. code-block:: text
 
@@ -143,19 +144,22 @@ Here, :math:`r_{CH}` is the equilibrium length of the covalent bond between carb
 
 One other special case is a methane molecule, in which case the hydrogens are in the vertices of a `regular tetrahedron <https://en.wikipedia.org/wiki/Tetrahedron#:~:text=(Vertex%20figure),edges%2C%20and%20four%20vertex%20corners.>`_.
 
+Now we can create coordinates for alkane chain of an arbitrary length, let us build topologies for these molecules.
+
 Topology
 --------
 
-In case with benzene molecule we were lucky since there was a residue topology that we used to create a molecular topology for the molecule.
-
-All carbons are the same apart from the first one.
-
-
-To get an idea on what atom types and parameters to use, let us look at ``ethers.rtp`` file.
-The very first residue there is ``BUTA`` (butane), which should be a good template for the rest of the alkanes.
-
-
-
+We already looked at the topology of the butane molecule.
+Making topologies for the rest of alkanes should be then simple using analogy.
+In fact, there are some more in the ``ethers.itp`` file: ethane, octane. decane, etc.
+However, we can take it a notch further, by using the same mechanism that GROMACS uses for proteins.
+Proteins are sequences of amino acid residues, linked covalently.
+Since each residue is one of 20 standard amino-acids, there are :math:`20^100` variants to construct a 100-residue-long protein.
+Obviously, it is not possible to keep topology for all of them.
+Instead, each residue has special entries in their bond listings on how to connect the residue to the next/previous one, marked with +/- signs.
+Similarly, we can construct alkanes out of `residues`: CH3 and CH2 groups.
+For these, we can also add the intra-residue bonds, so that they will all be connected in the chain.
+To do this, add an ``alkanes.rtp`` file to the force-field folder and add following lines into it:
 
     .. code-block:: text
 
@@ -186,6 +190,95 @@ The very first residue there is ``BUTA`` (butane), which should be a good templa
         C     H3
         -C     C
 
+Here we have residue ``CH2``, containing of three atoms: one carbon (``C``) and two hydrogens (``H1`` and ``H2``).
+The atom types are listed in the second column of the ``atoms`` section, followed by the atom charges.
+These are taken from the butane topology (see above).
+The last column is the charge group: the total charge of a group should be integer number of electron charges (zero in our case).
+The atom names should be unique, since they define the connectivity within and between residues.
+As it is follows from the ``bonds`` section, the carbon atom is connected to both hydrogens and to carbon atom of residue before (``-C``) and after (``+C``).
+
+It is very important that the atom names used here are matched with those we specify in the coordinate files.
+Also, it is important the the residues are named and numbered properly there.
+Here is an example of such file for butane in ``.gro`` format:
+
+    .. code-block:: text
+
+        C4H10
+        14
+            1CH3      C    1   0.129   0.169   0.182
+            1CH3     H1    2   0.060   0.254   0.182
+            1CH3     H2    3   0.108   0.108   0.273
+            1CH3     H3    4   0.108   0.108   0.091
+            2CH2      C    5   0.263   0.241   0.182
+            2CH2     H1    6   0.266   0.307   0.272
+            2CH2     H2    7   0.266   0.307   0.092
+            3CH2      C    8   0.389   0.157   0.182
+            3CH2     H1    9   0.387   0.091   0.273
+            3CH2     H2   10   0.387   0.091   0.091
+            4CH3      C   11   0.523   0.229   0.182
+            4CH3     H1   12   0.593   0.145   0.182
+            4CH3     H2   13   0.544   0.291   0.273
+            4CH3     H3   14   0.544   0.291   0.091
+
+There are 4 residues in total, in the following order: CH3-CH2-CH2-CH3.
+
+Note that these topologies above don't have the angle and dihedral angle description, neither there is a type for the bonds.
+These are constructed using the criteria that should be added to the beginning of the ``alkanes.rtp`` file:
+
+    .. code-block:: text
+                
+        [ bondedtypes ]
+        ; Col 1: Type of bond 
+        ; Col 2: Type of angles 
+        ; Col 3: Type of proper dihedrals 
+        ; Col 4: Type of improper dihedrals 
+        ; Col 5: Generate all dihedrals if 1, only heavy atoms of 0. 
+        ; Col 6: Number of excluded neighbors for nonbonded interactions 
+        ; Col 7: Generate 1,4 interactions between pairs of hydrogens if 1 
+        ; Col 8: Remove propers over the same bond as an improper if it is 1 
+        ; bonds  angles  dihedrals  impropers  all_dihedrals  nrexcl  HH14  RemoveDih 
+        1       5        9          2            1           3      1       0
+
+As it follows from the column-by-column comments, GROMACS will generate harmonic bonds (type 1), Urey-Bradley angles (type 5), multiple proper dihedrals (type 9), etc. (more information on bond type is available in `GROMACS manual <https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html>`_).
+Column 5 indicates that all dihedrals will be generated, which we will see once it is done.
+
+Generate topology and run energy minimization
+---------------------------------------------
+
+
+    .. code-block:: text
+
+        # Run GROMACS to create top files for all the PDBs in the folder
+        $GMX pdb2gmx -f $filename -o ${name}.gro -p ${name}.top -i ${name}_posre.itp -ff charmm36 -water tip3p
+        # Create a copy of the topology that can be included
+        cp ${name}.top ${name}.itp
+        # Remove th1e header
+        sed -i -n '/\[ moleculetype \]/,$p' ${name}.itp
+        # Remove the footer
+        sed -i '/; Include Position restraint file/,$d' ${name}.itp
+        # Rename the molecule
+        sed -i "s/Other/${name}/g" ${name}.itp
+        # Combine topologies into one file
+        # cat ${name}.itp >> alkanes.itp
+        # Copy the topolgy to separate folder
+        cp ${name}.itp toppar/${name}.itp
+        
+        # Minimize energy
+        
+        # Move molecule so that all coordinates are positive
+        $GMX editconf -f ${name}.pdb -o ${name}.gro -d 0.1
+        # Create large simulation box (~no PBC simulations)
+        $GMX editconf -f ${name}.gro -o ${name}.gro -box 100 100 100 -noc
+        # Configure and run GROMACS
+        $GMX grompp -f em.mdp -c ${name}.gro -p ${name}.top -o ${name}_em.tpr
+        $GMX mdrun -deffnm ${name}_em
+        # Rename the system in the resulting file
+        sed -i "s/Protein/${name}/g" ${name}_em.gro
+        # Convert GRO to PDB
+        $GMX editconf -f ${name}_em.gro -o ${name}_em.pdb
+        # Copy the resulting coordinates
+        cp ${name}_em.gro coord/${name}.gro
+        cp ${name}_em.pdb coord/${name}.pdb
 
 Create topologies and coordinates for the alkanes in CHARMM36
 -------------------------------------------------------------
