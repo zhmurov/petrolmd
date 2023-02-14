@@ -108,7 +108,8 @@ Codes in this project
    :caption: Table of contents
 
    Benzene/index
-   CreateAlkanesTraPPE-UA/index
    CreateAlkanesCHARMM/index
+   CreateAlkanesTraPPE-UA/index
+   CountNumMolecules/index
    Octane/index
    Quartz/index
