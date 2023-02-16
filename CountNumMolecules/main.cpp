@@ -17,6 +17,8 @@ struct Molecule
     float massConcentration;
     float concentration;
     int count;
+
+    float xmin, ymin, zmin, xmax, ymax, zmax;
 };
 
 std::vector<Molecule> molecules;
@@ -130,12 +132,33 @@ int main(int argc, char *argv[])
             if (tokens[0][0] != '#')
             {
                 float mass = getMass(tokens[0]);
-                float massConcentration = atof(tokens[1].c_str())*0.01;
+                float massConcentration = std::stof(tokens[1])*0.01;
 
                 Molecule molecule;
                 molecule.name = tokens[0];
                 molecule.mass = mass;
                 molecule.massConcentration = massConcentration;
+
+                if (tokens.size() == 8)
+                {
+                    molecule.xmin = std::stof(tokens[2]);
+                    molecule.ymin = std::stof(tokens[3]);
+                    molecule.zmin = std::stof(tokens[4]);
+
+                    molecule.xmax = std::stof(tokens[5]);
+                    molecule.ymax = std::stof(tokens[6]);
+                    molecule.zmax = std::stof(tokens[7]);
+                }
+                else
+                {
+                    molecule.xmin = 0.0;
+                    molecule.ymin = 0.0;
+                    molecule.zmin = 0.0;
+
+                    molecule.xmax = Lx;
+                    molecule.ymax = Ly;
+                    molecule.zmax = Lz;
+                }
 
                 molecules.push_back(molecule);             
 
@@ -192,7 +215,13 @@ int main(int argc, char *argv[])
     {
         out << "structure toppar/" << molecule.name << ".pdb" << std::endl;
         out << "  number " << molecule.count << std::endl;
-        out << "  inside box 0. 0. 0. " << Lx*10.0f << " " << Ly*10.0f << " " << Lz*10.0f << std::endl;
+        out << "  inside box " 
+            << molecule.xmin*10.0 << " "
+            << molecule.ymin*10.0 << " "
+            << molecule.zmin*10.0 << " "
+            << molecule.xmax*10.0 << " "
+            << molecule.ymax*10.0 << " "
+            << molecule.zmax*10.0 << std::endl;
         out << "end structure" << std::endl;
     }
 
