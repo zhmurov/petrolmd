@@ -110,7 +110,6 @@ Codes in this project
    Benzene/index
    CreateAlkanesCHARMM/index
    CreateAlkanesTraPPE-UA/index
-   CountNumMolecules/index
    Octane/index
    Quartz/index
    CountNumMolecules/index
