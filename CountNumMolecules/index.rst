@@ -22,16 +22,75 @@ The ``.dat`` file for a 5/95 mixture of ethane with octane follows.
         C2H6        5.0
         C8H18       95.0
 
+To get topology and Packmol input file, run the ``count_mols`` script.
+
+    .. code-block:: shell
+
+        ${PETROLMD}/build/CountNumMolecules/count_mols ${PETROLMD}/CountNumMolecules/files/atomic_weights.dat ${PETROLMD}/CountNumMolecules/files/${SYSTEM_NAME}.dat ${SYSTEM_NAME} ${Lx} ${Ly} ${Lz}
+
+These will generate the following two files:
+
+    .. code-block:: text
+
+        tolerance 2.0
+        filetype pdb
+        output ethane-octane.pdb
+
+        structure toppar/C2H6.pdb
+        number 8011
+        inside box 0 0 0 200 200 200
+        end structure
+        structure toppar/C8H18.pdb
+        number 40066
+        inside box 0 0 0 200 200 200
+        end structure
+
+    .. code-block:: text
+
+        ; Include forcefield parameters
+        #include "trappeua.ff/forcefield.itp"
+        #include "trappeua.ff/tip4p2005.itp"
+        #include "toppar/C2H6.itp"
+        #include "toppar/C8H18.itp"
+
+        [ system ]
+        ; Name
+        ethane-octane
+
+        [ molecules ]
+        ; Compound     #mols
+        C2H6      8011
+        C8H18      40066
+
+
+
 If we want to separate the gas (ethane) from the liquid (octane), we need to specify different volumes for these:
 
     .. code-block:: text
 
-        C2H6        5.0      0.0   0.0   0.0   50.0  100.0  100.0
-        C8H18       95.0    50.0   0.0   0.0  100.0  100.0  100.0
+        C2H6        5.0      0.0   0.0   0.0   5.0  10.0  10.0
+        C8H18       95.0     5.0   0.0   0.0  10.0  10.0  10.0
 
 Note that the number of molecules will still be computed based on the input values of Lx, Ly, Lz, which allows one to adjust it.
 Packmol may have hard time to fill the volume, hence we can provide smaller Lx, Ly and Lz to reduce the number of molecules.
 The pressure control in simulation will handle the difference between the desired and real pressure when we start the simulations.
+If using the ``.dat`` file above, the resulting ``.top`` file will be the same, Packmol script will have new boundaries for the respective mixture components.
+
+    .. code-block:: text
+
+        tolerance 2.0
+        filetype pdb
+        output ethane-octane.pdb
+
+        structure toppar/C2H6.pdb
+        number 8011
+        inside box 0 0 0 50 100 100
+        end structure
+        structure toppar/C8H18.pdb
+        number 40066
+        inside box 50 0 0 100 100 100
+        end structure
+
 
 You may also find useful to have the configuration ``.mdp`` files for simulations.
 These are provided as well.
@@ -41,6 +100,16 @@ The ``count_mols`` program also requires the atomic weights database, which is u
 There is a file with standard atomic weights provided with the script.
 
     .. code-block:: shell
+
+
+        GMX=/usr/local/gromacs/bin/gmx
+        PACKMOL=~/git/external/packmol/packmol
+        PETROLMD=~/git/artemzhmurov/petrolmd/
+        CHARMM36_HOME=~/git/artemzhmurov/charmm36
+        Lx=20
+        Ly=20
+        Lz=20
+        SYSTEM_NAME=yamburg_recomb
 
         cp -r ${CHARMM36_HOME}/toppar/ .
         cp -r ${CHARMM36_HOME}/coord/ .
