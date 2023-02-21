@@ -5,8 +5,8 @@
 
 [ system ]
 ; Name
-1000 octane molecules
+100 octane molecules
 
 [ molecules ]
 ; Compound        #mols
-C8H18             1000
+C8H18             100

@@ -3,6 +3,6 @@ filetype pdb
 output octane.pdb
 
 structure charmm36.ff/C8H18.pdb
-number 1000 
-inside box 0. 0. 0. 100. 100. 100. 
+number 100 
+inside box 0. 0. 0. 40. 40. 40. 
 end structure
