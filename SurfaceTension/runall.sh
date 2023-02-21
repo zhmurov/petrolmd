@@ -25,3 +25,6 @@ $GMX grompp -f npt.mdp -c nvt.gro -p ${SYSTEM_NAME}.top -o npt.tpr
 $GMX mdrun -deffnm npt -update gpu
 $GMX grompp -f md_iso.mdp -c npt.gro -p ${SYSTEM_NAME}.top -o md_iso.tpr
 $GMX mdrun -deffnm md_iso -update gpu
+
+$GMX energy -f md_iso.edr -xvg none -b 5000 <<< $'Pres-XX\nPres-YY\nPres-ZZ\n\n' -o md_iso.pressure.xvg > md_iso.pressure.out
+
