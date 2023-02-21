@@ -1,3 +1,6 @@
+Linear hydrocarbons (alkanes) in TraPPE-UA
+==========================================
+
 GROMACS simulations of a box of 1000 octane molecules
 -----------------------------------------------------
 
@@ -152,8 +155,8 @@ Create PDB files
 
     .. code-block:: shell
 
-        mkdir toppar
-        cd toppar
+        mkdir hydrocarbons
+        cd hydrocarbons
         ${PETROLMD}/build/CreateAlkanesTraPPE-UA/create_alkanes
 
 Copy additional files, e.g. iso-butane and iso-pentane pdbs (see ``files/PDBs`` folder in this repo):

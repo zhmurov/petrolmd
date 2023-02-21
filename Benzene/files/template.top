@@ -2,7 +2,7 @@
 #include "charmm36.ff/forcefield.itp"
 #include "charmm36.ff/tip3p.itp"
 #include "charmm36.ff/ions.itp"
-#include "toppar/NEWMOLECULENAME.itp"
+#include "hydrocarbons/NEWMOLECULENAME.itp"
 
 [ system ]
 ; Name

@@ -286,7 +286,7 @@ The following script rely on properly set environment variables to define path t
         # Combine topologies into one file
         # cat ${name}.itp >> alkanes.itp
         # Copy the topolgy to separate folder
-        cp ${name}.itp toppar/${name}.itp
+        cp ${name}.itp hydrocarbons/${name}.itp
         
         # Minimize energy
         
@@ -302,8 +302,8 @@ The following script rely on properly set environment variables to define path t
         # Convert GRO to PDB
         $GMX editconf -f ${name}_em.gro -o ${name}_em.pdb
         # Copy the resulting coordinates
-        cp ${name}_em.gro coord/${name}.gro
-        cp ${name}_em.pdb coord/${name}.pdb
+        cp ${name}_em.gro hydrocarbons/${name}.gro
+        cp ${name}_em.pdb hydrocarbons/${name}.pdb
 
 Create topologies and coordinates for the alkanes in CHARMM36
 -------------------------------------------------------------
@@ -360,8 +360,7 @@ Running simulations
 
     .. code-block:: shell
 
-        cp -r ${CHARMM36_HOME}/toppar/ .
-        cp -r ${CHARMM36_HOME}/coord/ .
+        cp -r ${CHARMM36_HOME} .
         cp ${PETROLMD}/files/mdp-charmm36/*.mdp .
         ${PETROLMD}/build/CountNumMolecules/count_mols ${PETROLMD}/CountNumMolecules/files/atomic_weights.dat ${PETROLMD}/CountNumMolecules/files/${SYSTEM_NAME}.dat ${SYSTEM_NAME} ${Lx} ${Ly} ${Lz}
         $PACKMOL < ${SYSTEM_NAME}_packmol.inp

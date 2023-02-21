@@ -4,18 +4,17 @@
 GMX=/usr/local/gromacs/bin/gmx
 PACKMOL=~/git/external/packmol/packmol
 
-SYSTEM_NAME=octane_solv2
+SYSTEM_NAME=octane_solv
 PETROLMD=~/git/artemzhmurov/petrolmd
 FFHOME=~/git/artemzhmurov/charmm36
 
-cp -r ${FFHOME}/toppar/ .
-cp -r ${FFHOME}/coord/ .
+cp -r ${FFHOME}/charmm36.ff .
 
 cp ${PETROLMD}/Octane/files/*.inp .
 cp ${PETROLMD}/Octane/files/*.top .
 cp ${PETROLMD}/files/mdp-charmm36/* .
 
-$PACKMOL < ${SYSTEM_NAME}.inp
+$PACKMOL < ${SYSTEM_NAME}2.inp
  
 $GMX editconf -f ${SYSTEM_NAME}.pdb -o ${SYSTEM_NAME}.gro -box 4 4 4
 $GMX grompp -f em.mdp -c ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -o em.tpr

@@ -2,12 +2,12 @@ tolerance 2.0
 filetype pdb
 output octane_solv.pdb
 
-structure coord/C8H18.pdb
+structure charmm36.ff/hydrocarbons/C8H18.pdb
 number 100 
 inside box 0. 0. 0. 20. 40. 40. 
 end structure
 
-structure coord/tip3p.pdb
+structure charmm36.ff/tip3p.pdb
 number 1000 
 inside box 20. 0. 0. 40. 40. 40. 
 end structure

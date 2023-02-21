@@ -5,14 +5,13 @@ Running simulations
 -------------------
 
 To run simulations of arbitrary mixture of hydrocarbons, you are going to need:
-``toppar`` folder with molecular topologies of the system with the matching coordinates in ``coord`` folder.
-Both are available in the forcefield repository.
+A folder with molecular topologies of the system with the matching coordinates (available in the forcefield repository).
 You will need to create topology and input file for the Packmol software.
 This can be either done manually, or using the ``count_mols`` program.
 Later takes the ``.dat`` file with the mixture composition as an input.
 In this file, we list the names of the molecules and their mass concentration (in percent).
 The code will count the number of molecules assuming the density of 1 kg/l based on the dimensions of the box provided in the input.
-The propotions of the molecules will be computed based on their mass concentration listed in the file.
+The proportions of the molecules will be computed based on their mass concentration listed in the file.
 To separate molecules in the resulting simulation box, you can either edit the generated Packmol input, or by providing the sizes of the compartments for each component in the ``.dat`` file.
 These data is optional and if not in the file, the software will assume that the molecules should be in the box with diagonal (0,0,0) to (Lx, Ly, Lz), with the later numbers provided in the input.
 The ``.dat`` file for a 5/95 mixture of ethane with octane follows.
@@ -36,11 +35,11 @@ These will generate the following two files:
         filetype pdb
         output ethane-octane.pdb
 
-        structure toppar/C2H6.pdb
+        structure charmm36.ff/hydrocarbons/C2H6.pdb
         number 8011
         inside box 0 0 0 200 200 200
         end structure
-        structure toppar/C8H18.pdb
+        structure charmm36.ff/hydrocarbons/C8H18.pdb
         number 40066
         inside box 0 0 0 200 200 200
         end structure
@@ -48,10 +47,10 @@ These will generate the following two files:
     .. code-block:: text
 
         ; Include forcefield parameters
-        #include "trappeua.ff/forcefield.itp"
-        #include "trappeua.ff/tip4p2005.itp"
-        #include "toppar/C2H6.itp"
-        #include "toppar/C8H18.itp"
+        #include "charmm36.ff/forcefield.itp"
+        #include "charmm36.ff/tip3p.itp"
+        #include "charmm36.ff/hydrocarbons/C2H6.itp"
+        #include "charmm36.ff/hydrocarbons/C8H18.itp"
 
         [ system ]
         ; Name
@@ -82,11 +81,11 @@ If using the ``.dat`` file above, the resulting ``.top`` file will be the same, 
         filetype pdb
         output ethane-octane.pdb
 
-        structure toppar/C2H6.pdb
+        structure charmm36.ff/hydrocarbons/C2H6.pdb
         number 8011
         inside box 0 0 0 50 100 100
         end structure
-        structure toppar/C8H18.pdb
+        structure charmm36.ff/hydrocarbons/C8H18.pdb
         number 40066
         inside box 50 0 0 100 100 100
         end structure

@@ -15,18 +15,17 @@ $GMX editconf -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -d 0.1
 $GMX editconf -f ${SYSTEM_NAME}.gro -o ${SYSTEM_NAME}.gro -box 100 100 100 -noc
 $GMX grompp -f em.mdp -c ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -o ${SYSTEM_NAME}_em.tpr
 $GMX mdrun -deffnm ${SYSTEM_NAME}_em
-mkdir coord
-cp ${SYSTEM_NAME}_em.gro coord/${SYSTEM_NAME}.gro
+mkdir hydrocarbons
+cp ${SYSTEM_NAME}_em.gro hydrocarbons/${SYSTEM_NAME}.gro
 $GMX editconf -f ${SYSTEM_NAME}_em.gro -o ${SYSTEM_NAME}_em.pdb
-cp ${SYSTEM_NAME}_em.pdb coord/${SYSTEM_NAME}.pdb
+cp ${SYSTEM_NAME}_em.pdb hydrocarbons/${SYSTEM_NAME}.pdb
 
 # Make a topology for the molecule
 cp ${SYSTEM_NAME}.top ${SYSTEM_NAME}.itp
 sed -i -n '/\[ moleculetype \]/,$p' ${SYSTEM_NAME}.itp
 sed -i '/; Include Position restraint file/,$d' ${SYSTEM_NAME}.itp
 sed -i "s/Other/${SYSTEM_NAME}/g" ${SYSTEM_NAME}.itp
-mkdir toppar
-cp ${SYSTEM_NAME}.itp toppar/${SYSTEM_NAME}.itp
+cp ${SYSTEM_NAME}.itp hydrocarbons/${SYSTEM_NAME}.itp
 
 # Example on how to use the molecule topology
 cp ${PETROLMD}/Benzene/files/template.top ${SYSTEM_NAME}.top

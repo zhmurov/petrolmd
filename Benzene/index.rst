@@ -157,8 +157,8 @@ Hence, the resulting (energy minimized) structure will be saved as ``${SYSTEM_NA
         cp ${PETROLMD}/files/em_vac.mdp em.mdp
         $GMX grompp -f em.mdp -c ${SYSTEM_NAME}.gro -p ${SYSTEM_NAME}.top -o ${SYSTEM_NAME}_em.tpr
         $GMX mdrun -deffnm c
-        mkdir coord
-        cp ${SYSTEM_NAME}_em.gro coord/${SYSTEM_NAME}.gro
+        mkdir hydrocarbons
+        cp ${SYSTEM_NAME}_em.gro hydrocarbons/${SYSTEM_NAME}.gro
 
 Some software packages may need a ``.pdb`` file instead of ``.gro``.
 To convert, one can use ``editconf`` utility from GROMACS:
@@ -166,7 +166,7 @@ To convert, one can use ``editconf`` utility from GROMACS:
     .. code-block:: bash
 
         $GMX editconf -f ${SYSTEM_NAME}_em.gro -o ${SYSTEM_NAME}.pdb
-        cp ${SYSTEM_NAME}.pdb coord/${SYSTEM_NAME}.pdb
+        cp ${SYSTEM_NAME}.pdb hydrocarbons/${SYSTEM_NAME}.pdb
 
 The .mdp file
 -------------
@@ -215,8 +215,7 @@ The described procedures can be performed with the following script:
         sed -i -n '/\[ moleculetype \]/,$p' ${SYSTEM_NAME}.itp
         sed -i '/; Include Position restraint file/,$d' ${SYSTEM_NAME}.itp
         sed -i "s/Other/${SYSTEM_NAME}/g" ${SYSTEM_NAME}.itp
-        mkdir toppar
-        cp ${SYSTEM_NAME}.itp toppar/${SYSTEM_NAME}.itp
+        cp ${SYSTEM_NAME}.itp hydrocarbons/${SYSTEM_NAME}.itp
 
 Now, the system topology can just include the molecular topology file.
 For the system of a singular benzene, the topology will be:
@@ -225,7 +224,7 @@ For the system of a singular benzene, the topology will be:
 
         ; Include forcefield parameters
         #include "charmm36.ff/forcefield.itp"
-        #include "toppar/C6H6.itp"
+        #include "hydrocarbons/C6H6.itp"
 
         [ system ]
         ; Name

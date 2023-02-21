@@ -6,7 +6,7 @@ System coordinates
 
 To create the system, we will use Packmol software.
 Packmol takes coordinates of a single molecule and fills the specified volume with translated and rotated copies of the molecule.
-We assume that there is a ``coord`` folder with coordinates of single molecules that can be used to create a mixture.
+We assume that there is a ``charmm36.ff/hydrocarbons`` folder that contains coordinates of single molecules that can be used to create a mixture.
 To create a 10nm x 10nm x 10nm box containing 1000 octane molecules with Packmol, create ``octane.inp`` file with the following:
 
     .. code-block:: text
@@ -15,7 +15,7 @@ To create a 10nm x 10nm x 10nm box containing 1000 octane molecules with Packmol
         filetype pdb
         output octane.pdb
 
-        structure coord/C8H18.pdb
+        structure charmm36.ff/hydrocarbons/C8H18.pdb
         number 100
         inside box 0. 0. 0. 40. 40. 40. 
         end structure
@@ -38,7 +38,7 @@ System topology
 
 Now we have coordinates for the system, we need to create topology file.
 Since we already created the topology files for all the molecules in the mixture (octane in this case), the system topology is quite simple.
-We assume that these files are located in ``toppar`` folder in your working directory.
+We assume that these files are located in ``charmm36.ff/hydrocarbons`` folder in your working directory.
 All we need to do is to include pre-generated topologies for molecules in the mixture and list the number of molecules.
 Note that the number of molecules and their quantities should be the same as used when the coordinates were generated. The resulting top file is:
 
@@ -47,7 +47,7 @@ Note that the number of molecules and their quantities should be the same as use
         ; Include forcefield parameters
         #include "charmm36.ff/forcefield.itp"
         #include "charmm36.ff/tip3p.itp"
-        #include "toppar/C8H18.itp"
+        #include "charmm36.ff/hydrocarbons/C8H18.itp"
 
         [ system ]
         ; Name
@@ -84,12 +84,12 @@ To mix 1000 octane molecules with 5000 water molecules, one can use the followin
         filetype pdb
         output octane_solv.pdb
 
-        structure coord/C8H18.pdb
+        structure charmm36.ff/hydrocarbons/C8H18.pdb
         number 1000 
         inside box 0. 0. 0. 100. 100. 100. 
         end structure
 
-        structure coord/tip3p.pdb
+        structure charmm36.ff/hydrocarbons/tip3p.pdb
         number 5000 
         inside box 0. 0. 0. 100. 100. 100. 
         end structure
@@ -107,7 +107,7 @@ The corresponding topology file will be:
         ; Include forcefield parameters
         #include "charmm36.ff/forcefield.itp"
         #include "charmm36.ff/tip3p.itp"
-        #include "toppar/C8H18.itp"
+        #include "charmm36.ff/hydrocarbons/C8H18.itp"
 
         [ system ]
         ; Name
@@ -130,12 +130,12 @@ This is done by providing different compartments to Packmol:
         filetype pdb
         output octane_solv.pdb
 
-        structure coord/C8H18.pdb
+        structure charmm36.ff/hydrocarbons/C8H18.pdb
         number 1000 
         inside box 0. 0. 0. 50. 100. 100. 
         end structure
 
-        structure coord/tip3p.pdb
+        structure charmm36.ff/tip3p.pdb
         number 5000 
         inside box 50. 0. 0. 100. 100. 100. 
         end structure
