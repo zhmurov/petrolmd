@@ -1,0 +1,14 @@
+; Include forcefield parameters
+#include "charmm36.ff/forcefield.itp"
+#include "charmm36.ff/hydrocarbons/C2H6.itp"
+#include "charmm36.ff/hydrocarbons/C8H18.itp"
+
+
+[ system ]
+; Name
+Ethane-octane mixture
+
+[ molecules ]
+; Compound        #mols
+C8H18             5000
+C2H6              1000
