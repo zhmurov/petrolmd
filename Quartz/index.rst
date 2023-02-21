@@ -1,3 +1,6 @@
+Topology and coordinates for quartz slab
+========================================
+
 Creating the coordinates and topology for a quartz slab of a given size
 -----------------------------------------------------------------------
 
