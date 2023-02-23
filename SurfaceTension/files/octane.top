@@ -1,0 +1,11 @@
+; Include forcefield parameters
+#include "../charmm36.ff/forcefield.itp"
+#include "../charmm36.ff/hydrocarbons/C8H18.itp"
+
+[ system ]
+; Name
+1000 octane molecules
+
+[ molecules ]
+; Compound        #mols
+C8H18             1000

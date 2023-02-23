@@ -1,0 +1,11 @@
+; Include forcefield parameters
+#include "../charmm36.ff/forcefield.itp"
+#include "../charmm36.ff/hydrocarbons/NEWMOLECULENAME.itp"
+
+[ system ]
+; Name
+1000 NEWMOLECULENAME molecules
+
+[ molecules ]
+; Compound        #mols
+NEWMOLECULENAME   1000
