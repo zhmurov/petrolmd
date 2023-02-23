@@ -11,35 +11,38 @@ FFHOME=~/git/artemzhmurov/charmm36
 # Get the force-field
 cp -r ${FFHOME}/charmm36.ff .
 
-# Create folder for the molecular system
-mkdir ${SYSTEM_NAME}
-cd ${SYSTEM_NAME}
+for name in C1H4 C2H6 C3H8 C4H10_ISO C4H10 C5H12_ISO C5H12 C6H14 C6H6 C7H16 C8H18 C9H20 C10H22 C11H24 C12H26 C13H28 C14H30 C15H32 C16H34 C17H36 C18H38 C19H40 C20H42; do
 
-# Copy and preapre packmol input
-cp ${PETROLMD}/SurfaceTension/files/template.inp packmol.inp
-sed -i "s/NEWMOLECULENAME/${SYSTEM_NAME}/g" packmol.inp
+    # Create folder for the molecular system
+    mkdir ${name}
+    cd ${name}
 
-# Copy and prepare topology file
-cp ${PETROLMD}/SurfaceTension/files/template.top topol.top
-sed -i "s/NEWMOLECULENAME/${SYSTEM_NAME}/g" topol.top
+    # Copy and preapre packmol input
+    cp ${PETROLMD}/SurfaceTension/files/template.inp packmol.inp
+    sed -i "s/NEWMOLECULENAME/${name}/g" packmol.inp
 
-# Get the configuration files
-cp ${PETROLMD}/files/mdp-charmm36/em.mdp .
-cp ${PETROLMD}/files/mdp-charmm36/nvt.mdp .
+    # Copy and prepare topology file
+    cp ${PETROLMD}/SurfaceTension/files/template.top topol.top
+    sed -i "s/NEWMOLECULENAME/${name}/g" topol.top
 
-# Create initial structure with Packmol
-$PACKMOL < packmol.inp
- 
-# Configure and energy-minimize GROMACS
-$GMX editconf -f conf.pdb -o conf.gro -box 40 5 5
-$GMX grompp -f em.mdp -c conf.gro -o em.tpr
-$GMX mdrun -deffnm em
+    # Get the configuration files
+    cp ${PETROLMD}/files/mdp-charmm36/em.mdp .
+    cp ${PETROLMD}/files/mdp-charmm36/nvt.mdp .
 
-# Production run
-$GMX grompp -f nvt.mdp -c em.gro -o nvt.tpr
-$GMX mdrun -deffnm nvt -nsteps 5000000
+    # Create initial structure with Packmol
+    $PACKMOL < packmol.inp
+    
+    # Configure and energy-minimize GROMACS
+    $GMX editconf -f conf.pdb -o conf.gro -box 40 5 5
+    $GMX grompp -f em.mdp -c conf.gro -o em.tpr
+    $GMX mdrun -deffnm em
 
-# Get the pressure tensor components
-$GMX energy -f nvt.edr -xvg none -b 5000 <<< $'Pres-XX\nPres-YY\nPres-ZZ\n\n' -o nvt.pressure.xvg > nvt.pressure.out
+    # Production run
+    $GMX grompp -f nvt.mdp -c em.gro -o nvt.tpr
+    $GMX mdrun -deffnm nvt -nsteps 1000000
 
-cd ..
+    # Get the pressure tensor components
+    $GMX energy -f nvt.edr -xvg none -b 1000 -e 2000 <<< $'Pres-XX\nPres-YY\nPres-ZZ\n\n' -o nvt.pressure.xvg > nvt.pressure.out
+
+    cd ..
+done
