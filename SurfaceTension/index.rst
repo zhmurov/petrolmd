@@ -8,7 +8,7 @@ The surface tension can be computed using the following relation [AlejandreJCP95
 
     .. math::
 
-        \gamma=\frac{1}{2}\left(P_{XX}-\frac{1}{2}\left(P_{YY}+P_{ZZ}\right)\right)
+        \gamma=\frac{L_{X}}{2}\langle P_{XX}-\frac{1}{2}\left(P_{YY}+P_{ZZ}\right)\rangle
 
 
 
