@@ -34,7 +34,7 @@ for name in $hydrocarbons; do
     $PACKMOL < packmol.inp
     
     # Configure, energy-minimize, equilibrate in GROMACS
-    $GMX editconf -f conf.pdb -o conf.gro -box 40 5 5
+    $GMX editconf -f conf.pdb -o conf.gro -box 5 5 40
     $GMX grompp -f em.mdp -c conf.gro -o em.tpr
     $GMX mdrun -deffnm em
     $GMX grompp -f nvt.mdp -c em.gro -o nvt.tpr

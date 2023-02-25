@@ -42,7 +42,7 @@ for name in $hydrocarbons; do
     $PACKMOL < packmol.inp
     
     # Configure and energy-minimize GROMACS
-    $GMX editconf -f conf.pdb -o conf.gro -box 40 5 5
+    $GMX editconf -f conf.pdb -o conf.gro -box 5 5 40
     $GMX grompp -f em.mdp -c conf.gro -o em.tpr -maxwarn 1
     $GMX mdrun -deffnm em
 
@@ -51,7 +51,7 @@ for name in $hydrocarbons; do
     $GMX mdrun -deffnm nvt -nsteps 5000000
 
     # Get the pressure tensor components
-    $GMX energy -f nvt.edr -xvg none -b 5000 -e 10000 <<< $'Pres-XX\nPres-YY\nPres-ZZ\n\n' -o nvt.pressure.xvg > nvt.pressure.out
+    $GMX energy -f nvt.edr -xvg none -b 5000 -e 10000 <<< $'Pres-XX\nPres-YY\nPres-ZZ\n#Surf*SurfTen\n\n' -o nvt.pressure.xvg > nvt.pressure.out
 
     # Compute the surface tension
     python3 ${PETROLMD}/SurfaceTension/ComputeSurfaceTension.py > gamma.txt
