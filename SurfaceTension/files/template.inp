@@ -2,7 +2,7 @@ tolerance 2.0
 filetype pdb
 output conf.pdb
 
-structure ../charmm36.ff/hydrocarbons/NEWMOLECULENAME.pdb
+structure ../FORCEFIELD.ff/hydrocarbons/NEWMOLECULENAME.pdb
 number 1000 
 inside box 0. 0. 0. 300. 50. 50.
 end structure
