@@ -46,5 +46,8 @@ for name in $hydrocarbons; do
     # Get the pressure tensor components
     $GMX energy -f nvt.edr -xvg none -b 1000 -e 2000 <<< $'Pres-XX\nPres-YY\nPres-ZZ\n\n' -o nvt.pressure.xvg > nvt.pressure.out
 
+    # Compute the surface tension
+    python3 ${PETROLMD}/SurfaceTension/ComputeSurfaceTension.py > gamma.txt
+
     cd ..
 done
