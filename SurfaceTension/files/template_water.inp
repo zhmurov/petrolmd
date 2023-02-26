@@ -7,7 +7,7 @@ number 1000
 inside box 0. 0. 0. 50. 50. 300.
 end structure
 
-structure ../FORCEFIELD.ff/tip3p.pdb
+structure ../FORCEFIELD.ff/WATER.pdb
 number 10000 
 inside box 0. 0. 300. 50. 50. 400.
 end structure
