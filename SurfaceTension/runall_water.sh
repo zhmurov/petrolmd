@@ -4,12 +4,13 @@
 GMX=/usr/local/gromacs/bin/gmx
 PACKMOL=~/git/external/packmol/packmol
 
-SYSTEM_NAME=C8H18
 PETROLMD=~/git/artemzhmurov/petrolmd
-FFHOME=~/git/artemzhmurov/charmm36
+CHARMM36FFHOME=~/git/artemzhmurov/charmm36
+TRAPPEUAFFHOME=~/git/external/trappeua
 
-# Get the force-field
-cp -r ${FFHOME}/charmm36.ff .
+# Get the force-fields
+cp -r ${CHARMM36FFHOME}/charmm36.ff .
+cp -r ${TRAPPEUAFFHOME}/trappeua.ff .
 
 hydrocarbons="C4H10_ISO C4H10 C5H12_ISO C5H12 C6H14 C6H6 C7H16 C8H18 C9H20 C10H22 C11H24 C12H26 C13H28 C14H30 C15H32 C16H34 C17H36 C18H38 C19H40 C20H42"
 
@@ -22,10 +23,12 @@ for name in $hydrocarbons; do
     # Copy and preapre packmol input
     cp ${PETROLMD}/SurfaceTension/files/template.inp packmol.inp
     sed -i "s/NEWMOLECULENAME/${name}/g" packmol.inp
+    sed -i "s/FORCEFIELD/${forcefield}/g" packmol.inp
 
     # Copy and prepare topology file
     cp ${PETROLMD}/SurfaceTension/files/template.top topol.top
     sed -i "s/NEWMOLECULENAME/${name}/g" topol.top
+    sed -i "s/FORCEFIELD/${forcefield}/g" topol.top
 
     # Get the configuration files
     cp ${PETROLMD}/files/mdp-charmm36/*.mdp .
@@ -35,19 +38,22 @@ for name in $hydrocarbons; do
     
     # Configure, energy-minimize, equilibrate in GROMACS
     $GMX editconf -f conf.pdb -o conf.gro -box 5 5 40
-    $GMX grompp -f em.mdp -c conf.gro -o em.tpr
+    $GMX grompp -f em.mdp -c conf.gro -o em.tpr -maxwarn 1
     $GMX mdrun -deffnm em
-    $GMX grompp -f nvt.mdp -c em.gro -o nvt.tpr
+    $GMX grompp -f nvt.mdp -c em.gro -o nvt.tpr -maxwarn 1
     $GMX mdrun -deffnm nvt
-    $GMX grompp -f npt.mdp -c nvt.gro -o npt.tpr
+    $GMX grompp -f npt.mdp -c nvt.gro -o npt.tpr -maxwarn 1
     $GMX mdrun -deffnm npt -update gpu
 
     # Production run    
-    $GMX grompp -f md_iso.mdp -c npt.gro -o md_iso.tpr
+    $GMX grompp -f md_iso.mdp -c npt.gro -o md_iso.tpr -maxwarn 1
     $GMX mdrun -deffnm md_iso -update gpu
 
     # Get the pressure tensor components
-    $GMX energy -f md_iso.edr -xvg none -b 1000 -e 2000 <<< $'Pres-XX\nPres-YY\nPres-ZZ\n\n' -o md_iso.pressure.xvg > md_iso.pressure.out
+    $GMX energy -f nvt.edr -xvg none -b 5000 -e 10000 <<< $'Pres-XX\nPres-YY\nPres-ZZ\n#Surf*SurfTen\n\n' -o nvt.pressure.xvg > nvt.pressure.out
+
+    # Compute the surface tension
+    python3 ${PETROLMD}/SurfaceTension/ComputeSurfaceTension.py > gamma.txt
 
     cd ..
 done
