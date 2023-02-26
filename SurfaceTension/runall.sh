@@ -18,6 +18,10 @@ forcefield=$1
 
 for name in $hydrocarbons; do
 
+    echo "================================================================================"
+    echo "  Working on ${name}"
+    echo "================================================================================"
+
     # Create folder for the molecular system
     mkdir ${name}
     cd ${name}
