@@ -4,7 +4,6 @@
 GMX=/usr/local/gromacs/bin/gmx
 PACKMOL=~/git/external/packmol/packmol
 
-SYSTEM_NAME=C8H18
 PETROLMD=~/git/artemzhmurov/petrolmd
 CHARMM36FFHOME=~/git/artemzhmurov/charmm36
 TRAPPEUAFFHOME=~/git/external/trappeua
@@ -14,7 +13,6 @@ cp -r ${CHARMM36FFHOME}/charmm36.ff .
 cp -r ${TRAPPEUAFFHOME}/trappeua.ff .
 
 hydrocarbons="C4H10_ISO C4H10 C5H12_ISO C5H12 C6H14 C6H6 C7H16 C8H18 C9H20 C10H22 C11H24 C12H26 C13H28 C14H30 C15H32 C16H34 C17H36 C18H38 C19H40 C20H42"
-#hydrocarbons="C10H22"
 
 forcefield=$1
 
