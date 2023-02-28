@@ -36,19 +36,19 @@ for name in $hydrocarbons; do
     cd ${name}
 
     # Copy and preapre packmol input
-    cp ${PETROLMD}/SurfaceTension/files/template.inp packmol.inp
+    cp ${PETROLMD}/SurfaceTension/files/template_water.inp packmol.inp
     sed -i "s/NEWMOLECULENAME/${name}/g" packmol.inp
     sed -i "s/FORCEFIELD/${forcefield}/g" packmol.inp
     sed -i "s/WATER/${water}/g" packmol.inp
 
     # Copy and prepare topology file
-    cp ${PETROLMD}/SurfaceTension/files/template.top topol.top
+    cp ${PETROLMD}/SurfaceTension/files/template_water.top topol.top
     sed -i "s/NEWMOLECULENAME/${name}/g" topol.top
     sed -i "s/FORCEFIELD/${forcefield}/g" topol.top
     sed -i "s/WATER/${water}/g" topol.top
 
     # Get the configuration files
-    cp ${PETROLMD}/files/mdp-charmm36/*.mdp .
+    cp ${PETROLMD}/files/mdp-${forcefield}/*.mdp .
 
     # Create initial structure with Packmol
     $PACKMOL < packmol.inp
@@ -70,7 +70,7 @@ for name in $hydrocarbons; do
     $GMX energy -f nvt.edr -xvg none -b 5000 -e 10000 <<< $'Pres-XX\nPres-YY\nPres-ZZ\n#Surf*SurfTen\n\n' -o nvt.pressure.xvg > nvt.pressure.out
 
     # Compute the surface tension
-    python3 ${PETROLMD}/SurfaceTension/ComputeSurfaceTension.py > gamma.txt
+    #python3 ${PETROLMD}/SurfaceTension/ComputeSurfaceTension.py > gamma.txt
 
     cd ..
 done

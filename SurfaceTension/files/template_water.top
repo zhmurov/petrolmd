@@ -1,10 +1,11 @@
 ; Include forcefield parameters
 #include "../FORCEFIELD.ff/forcefield.itp"
+#include "../FORCEFIELD.ff/WATER.itp"
 #include "../FORCEFIELD.ff/hydrocarbons/NEWMOLECULENAME.itp"
 
 [ system ]
 ; Name
-1000 NEWMOLECULENAME molecules
+1000 NEWMOLECULENAME molecules in water
 
 [ molecules ]
 ; Compound        #mols
