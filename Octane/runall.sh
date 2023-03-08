@@ -42,13 +42,13 @@ for name in $hydrocarbons; do
     $PACKMOL < packmol.inp
     
     $GMX editconf -f conf.pdb -o conf.gro -box 20 20 20
-    $GMX grompp -f em.mdp -c conf.gro -o em.tpr
+    $GMX grompp -f em.mdp -c conf.gro -o em.tpr -maxwarn 1
     $GMX mdrun -deffnm em
-    $GMX grompp -f nvt.mdp -c em.gro -o nvt.tpr
+    $GMX grompp -f nvt.mdp -c em.gro -o nvt.tpr -maxwarn 1
     $GMX mdrun -deffnm nvt
-    $GMX grompp -f npt.mdp -c nvt.gro -o npt.tpr
+    $GMX grompp -f npt.mdp -c nvt.gro -o npt.tpr -maxwarn 1
     $GMX mdrun -deffnm npt -update gpu
-    $GMX grompp -f md_iso.mdp -c npt.gro -o md_iso.tpr
+    $GMX grompp -f md_iso.mdp -c npt.gro -o md_iso.tpr -maxwarn 1
     $GMX mdrun -deffnm md_iso -update gpu
 
     cd ..
