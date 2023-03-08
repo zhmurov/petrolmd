@@ -7,7 +7,7 @@ Build and install GROMACS
 
         git clone https://gitlab.com/gromacs/gromacs.git
         cd gromacs
-        git checkout v2022.1
+        git checkout v2022.5
 
 2. Build and install
 
