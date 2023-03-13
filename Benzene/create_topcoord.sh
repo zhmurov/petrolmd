@@ -28,5 +28,6 @@ sed -i "s/Other/${SYSTEM_NAME}/g" ${SYSTEM_NAME}.itp
 cp ${SYSTEM_NAME}.itp hydrocarbons/${SYSTEM_NAME}.itp
 
 # Example on how to use the molecule topology
+cp ${SYSTEM_NAME}.top ${SYSTEM_NAME}_generated.top
 cp ${PETROLMD}/Benzene/files/template.top ${SYSTEM_NAME}.top
 sed -i "s/NEWMOLECULENAME/${SYSTEM_NAME}/g" ${SYSTEM_NAME}.top
