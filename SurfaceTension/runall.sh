@@ -8,6 +8,12 @@ PETROLMD=~/git/artemzhmurov/petrolmd
 CHARMM36FFHOME=~/git/artemzhmurov/charmm36
 TRAPPEUAFFHOME=~/git/external/trappeua
 
+NUMMOLECULES=1000.
+
+LX=50.
+LY=50.
+LZ=300.
+
 # Get the force-fields
 cp -r ${CHARMM36FFHOME}/charmm36.ff .
 cp -r ${TRAPPEUAFFHOME}/trappeua.ff .
@@ -30,11 +36,16 @@ for name in $hydrocarbons; do
     cp ${PETROLMD}/SurfaceTension/files/template.inp packmol.inp
     sed -i "s/NEWMOLECULENAME/${name}/g" packmol.inp
     sed -i "s/FORCEFIELD/${forcefield}/g" packmol.inp
+    sed -i "s/NUMMOLECULES/${NUMMOLECULES}/g" packmol.inp
+    sed -i "s/LX/${LX}/g" packmol.inp
+    sed -i "s/LY/${LY}/g" packmol.inp
+    sed -i "s/LZ/${LZ}/g" packmol.inp    
 
     # Copy and prepare topology file
     cp ${PETROLMD}/SurfaceTension/files/template.top topol.top
     sed -i "s/NEWMOLECULENAME/${name}/g" topol.top
     sed -i "s/FORCEFIELD/${forcefield}/g" topol.top
+    sed -i "s/NUMMOLECULES/${NUMMOLECULES}/g" topol.top
 
     # Get the configuration files
     cp ${PETROLMD}/files/mdp-${forcefield}/em.mdp .
