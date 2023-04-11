@@ -4,8 +4,8 @@
 
 [ system ]
 ; Name
-1000 NEWMOLECULENAME molecules
+NUMMOLECULES NEWMOLECULENAME molecules
 
 [ molecules ]
 ; Compound        #mols
-NEWMOLECULENAME   1000
+NEWMOLECULENAME   NUMMOLECULES
