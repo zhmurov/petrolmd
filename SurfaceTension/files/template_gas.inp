@@ -1,0 +1,13 @@
+tolerance 2.0
+filetype pdb
+output conf.pdb
+
+structure ../FORCEFIELD.ff/hydrocarbons/NEWMOLECULENAME.pdb
+number NUMMOLECULES 
+inside box 0. 0. 0. LX LY LZ
+end structure
+
+structure ../FORCEFIELD.ff/misc/CO2.pdb
+number 100 
+inside box 0. 0. 0. LX LY LZ2
+end structure

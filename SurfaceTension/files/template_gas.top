@@ -1,0 +1,13 @@
+; Include forcefield parameters
+#include "../FORCEFIELD.ff/forcefield.itp"
+#include "../FORCEFIELD.ff/hydrocarbons/NEWMOLECULENAME.itp"
+#include "../FORCEFIELD.ff/misc/CO2.itp"
+
+[ system ]
+; Name
+NUMMOLECULES NEWMOLECULENAME molecules in gas
+
+[ molecules ]
+; Compound        #mols
+NEWMOLECULENAME   NUMMOLECULES
+CO2               100
