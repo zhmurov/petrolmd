@@ -7,9 +7,39 @@
 
 #include "pdbio.h"
 
-#define NBINX 40
-#define NBINY 40
-#define NBINZ 40
+#define NBINX 10
+#define NBINY 10
+#define NBINZ 10
+
+
+float computeGaussianDensity(float x, float y, float z, float sigma, chemfiles::Frame &frame)
+{
+    chemfiles::span<chemfiles::Vector3D> positions = frame.positions();
+    chemfiles::Topology topology = frame.topology();
+
+    double result = 0.0;
+
+    //for (auto atom = topology.begin(), pos = positions.begin(); atom != topology.end() && pos != positions.end(); ++atom, ++pos)
+    //for (auto& [atom, pos] : zip(topology, positions))
+    for (int i = 0; i < topology.size(); i++)
+    {
+        auto atom = topology[i];
+        auto pos = positions[i];
+
+        float dx = x - pos[0];
+        float dy = y - pos[1];
+        float dz = z - pos[2];
+        
+        // Add PBC
+
+        float dr2 = dx*dx + dy*dy + dz*dz;
+        
+        float gauss = atom.mass()*(1.0/(sigma*sqrtf(2.0*M_PI)))*expf(-0.5*dr2/(sigma*sigma));
+        result += gauss;
+    }
+
+    return result/topology.size();
+}
 
 inline int getIdx(int ix, int iy, int iz)
 {
@@ -151,17 +181,22 @@ int main() {
     nbin[1] = NBINY;
     nbin[2] = NBINZ;
 
-    readMolTypes("/home/zhmurov/Data/Sirius/PetrolMD/28-yamburg-nogas/yamburg_recomb.top");
+    readMolTypes("/home/zhmurov/Data/Sirius2/PetrolMD2/4-SurfaceTensionCO2-NVT/C10H22/topol.top");
 
-    chemfiles::Trajectory mds("/home/zhmurov/Data/Sirius/PetrolMD/28-yamburg-nogas/md_iso.xtc");
-    mds.set_topology("/home/zhmurov/Data/Sirius/PetrolMD/28-yamburg-nogas/md_iso.tpr");
+    chemfiles::Trajectory mds("/home/zhmurov/Data/Sirius2/PetrolMD2/4-SurfaceTensionCO2-NVT/C10H22/nvt.xtc");
+    mds.set_topology("/home/zhmurov/Data/Sirius2/PetrolMD2/4-SurfaceTensionCO2-NVT/C10H22/nvt.tpr");
+
+    //readMolTypes("/home/zhmurov/Data/Sirius/PetrolMD/28-yamburg-nogas/yamburg_recomb.top");
+
+    //chemfiles::Trajectory mds("/home/zhmurov/Data/Sirius/PetrolMD/28-yamburg-nogas/md_iso.xtc");
+    //mds.set_topology("/home/zhmurov/Data/Sirius/PetrolMD/28-yamburg-nogas/md_iso.tpr");
 
     //chemfiles::Trajectory mds("/home/zhmurov/Sirius/5-charmm/md_iso.xtc");
     //mds.set_topology("/home/zhmurov/Sirius/5-charmm/md_iso.tpr");
 
     std::vector<double> hist = std::vector<double>(NBINX*NBINY*NBINZ, 0.0);
 
-    /*PDB pdbOut;
+    PDB pdbOut;
     pdbOut.atomCount = NBINX*NBINY*NBINZ;
     pdbOut.atoms = (PDBAtom*)calloc(pdbOut.atomCount, sizeof(PDBAtom));
     pdbOut.ssCount = 0;
@@ -184,7 +219,7 @@ int main() {
                 pdbOut.atoms[idx].beta = 0.0;
             }
         }
-    }*/
+    }
     auto frame = mds.read();
     
     std::vector<chemfiles::Vector3D> oldcoms = std::vector<chemfiles::Vector3D>(totMoleculesCount, {0.0, 0.0, 0.0});
@@ -210,6 +245,9 @@ int main() {
 
     for (size_t step = 1; step < mds.nsteps(); step++)
     {
+        
+        printf("Step: %ld\n", step);
+
         auto frame = mds.read();
         auto uc = frame.cell();
         auto ucl = uc.lengths();
@@ -239,20 +277,30 @@ int main() {
             hist[getIdx(idx)] ++;
         }
 
-        /*for (int ix = 0; ix < NBINX; ix++)
+        for (int ix = 0; ix < NBINX; ix++)
         {
             for (int iy = 0; iy < NBINY; iy++)
             {
                 for (int iz = 0; iz < NBINZ; iz++)
                 {
                     int idx = getIdx(ix, iy, iz);
-                    pdbOut.atoms[idx].x = static_cast<float>(ix)*ucl[0]/static_cast<float>(NBINX);
-                    pdbOut.atoms[idx].y = static_cast<float>(iy)*ucl[1]/static_cast<float>(NBINY);
-                    pdbOut.atoms[idx].z = static_cast<float>(iz)*ucl[2]/static_cast<float>(NBINZ);
-                    pdbOut.atoms[idx].occupancy = hist[idx];
+
+                    float x = static_cast<float>(ix)*ucl[0]/static_cast<float>(NBINX);
+                    float y = static_cast<float>(iy)*ucl[1]/static_cast<float>(NBINY);
+                    float z = static_cast<float>(iz)*ucl[2]/static_cast<float>(NBINZ);
+
+                    pdbOut.atoms[idx].x = x;
+                    pdbOut.atoms[idx].y = y;
+                    pdbOut.atoms[idx].z = z;
+                    pdbOut.atoms[idx].occupancy = computeGaussianDensity(x, y, z, 1.0, frame);
                 }
             }
-        }*/
+        }
+        
+        std::ostringstream filename;
+        filename << "mesh_" << step << ".pdb";
+        writePDB(filename.str().c_str(), &pdbOut);
+        
 
         std::vector<chemfiles::Vector3D> coms = computeCOMs(frame.positions());
 
@@ -312,10 +360,6 @@ int main() {
             i++;
         }
         std::copy(frame.positions().begin(), frame.positions().end(), std::back_inserter(oldpos));*/
-
-        //std::ostringstream filename;
-        //filename << "mesh_" << step << ".pdb";
-        //writePDB(filename.str().c_str(), &pdbOut);
 
         std::fill(hist.begin(), hist.end(), 0.0);
     }
