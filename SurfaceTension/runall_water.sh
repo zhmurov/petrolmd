@@ -70,7 +70,7 @@ for name in $hydrocarbons; do
     $GMX energy -f nvt.edr -xvg none -b 5000 -e 10000 <<< $'Pres-XX\nPres-YY\nPres-ZZ\n#Surf*SurfTen\n\n' -o nvt.pressure.xvg > nvt.pressure.out
 
     # Compute the surface tension
-    #python3 ${PETROLMD}/SurfaceTension/ComputeSurfaceTension.py > gamma.txt
+    python3 ${PETROLMD}/SurfaceTension/ComputeSurfaceTension.py nvt.pressure.xvg > gamma.txt
 
     cd ..
 done

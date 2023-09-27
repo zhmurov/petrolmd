@@ -1,4 +1,4 @@
-import csv, json
+import csv, json, sys
 
 header = ['Time', 'Pxx', 'Pyy', 'Pzz']
 
@@ -6,7 +6,7 @@ n = 0
 gamma1 = 0.0
 gamma2 = 0.0
 
-with open('nvt.pressure.xvg') as datfile:
+with open(sys.argv[1]) as datfile:
     for line in datfile:
         data = line.split()
         time = float(data[0])

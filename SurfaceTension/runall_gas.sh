@@ -71,17 +71,17 @@ for name in $hydrocarbons; do
     $GMX grompp -f nvt.mdp -c em.gro -o nvt.tpr
     $GMX mdrun -deffnm nvt
     $GMX grompp -f npt.mdp -c nvt.gro -o npt.tpr
-    $GMX mdrun -deffnm npt -update gpu
+    $GMX mdrun -deffnm npt -update gpu -nsteps 500000
 
     # Production run    
-    $GMX grompp -f md_iso.mdp -c npt.gro -o md_iso.tpr
-    $GMX mdrun -deffnm md_iso -update gpu
+    $GMX grompp -f md_nvt.mdp -c npt.gro -o md_nvt.tpr
+    $GMX mdrun -deffnm md_nvt -update gpu
 
     # Get the pressure tensor components
-    $GMX energy -f md_iso.edr -xvg none -b 5000 -e 10000 <<< $'Pres-XX\nPres-YY\nPres-ZZ\n#Surf*SurfTen\n\n' -o md_iso.pressure.xvg > md_iso.pressure.out
+    $GMX energy -f md_nvt.edr -xvg none -b 5000 -e 10000 <<< $'Pres-XX\nPres-YY\nPres-ZZ\n#Surf*SurfTen\n\n' -o md_nvt.pressure.xvg > md_nvt.pressure.out
 
     # Compute the surface tension
-    python3 ${PETROLMD}/SurfaceTension/ComputeSurfaceTension.py > gamma.txt
+    python3 ${PETROLMD}/SurfaceTension/ComputeSurfaceTension.py md_nvt.pressure.xvg > gamma.txt
 
     cd ..
 done
