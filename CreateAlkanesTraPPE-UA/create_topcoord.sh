@@ -21,7 +21,7 @@ for filename in *.pdb; do
     $GMX pdb2gmx -f $filename -o ${name}.gro -p ${name}.top -i ${name}_posre.itp -ff trappeua -water tip4p
     # Create a copy of the topology that can be included
     cp ${name}.top ${name}.itp
-    # Remove th1e header
+    # Remove the header
     sed -i -n '/\[ moleculetype \]/,$p' ${name}.itp
     # Remove pairs section (needed by TraPPE forcefield)
     if grep -Fxq "[ pairs ]" ${name}.itp
