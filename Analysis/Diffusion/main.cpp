@@ -181,13 +181,15 @@ int main() {
     nbin[1] = NBINY;
     nbin[2] = NBINZ;
 
-    readMolTypes("/home/zhmurov/Data/Sirius2/PetrolMD2/4-SurfaceTensionCO2-NVT/C10H22/topol.top");
-
-    chemfiles::Trajectory mds("/home/zhmurov/Data/Sirius2/PetrolMD2/4-SurfaceTensionCO2-NVT/C10H22/nvt.xtc");
+    readMolTypes("/home/zhmurov/git/artemzhmurov/petrolmd/Analysis/Diffusion/test/topol.top");
+    chemfiles::Trajectory mds("/home/zhmurov/git/artemzhmurov/petrolmd/Analysis/Diffusion/test/nvt.xtc");
     mds.set_topology("/home/zhmurov/Data/Sirius2/PetrolMD2/4-SurfaceTensionCO2-NVT/C10H22/nvt.tpr");
 
-    //readMolTypes("/home/zhmurov/Data/Sirius/PetrolMD/28-yamburg-nogas/yamburg_recomb.top");
+    //readMolTypes("/home/zhmurov/Data/Sirius2/PetrolMD2/4-SurfaceTensionCO2-NVT/C10H22/topol.top");
+    //chemfiles::Trajectory mds("/home/zhmurov/Data/Sirius2/PetrolMD2/4-SurfaceTensionCO2-NVT/C10H22/nvt.xtc");
+    //mds.set_topology("/home/zhmurov/Data/Sirius2/PetrolMD2/4-SurfaceTensionCO2-NVT/C10H22/nvt.tpr");
 
+    //readMolTypes("/home/zhmurov/Data/Sirius/PetrolMD/28-yamburg-nogas/yamburg_recomb.top");
     //chemfiles::Trajectory mds("/home/zhmurov/Data/Sirius/PetrolMD/28-yamburg-nogas/md_iso.xtc");
     //mds.set_topology("/home/zhmurov/Data/Sirius/PetrolMD/28-yamburg-nogas/md_iso.tpr");
 
