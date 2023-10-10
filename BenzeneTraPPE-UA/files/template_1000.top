@@ -1,0 +1,11 @@
+; Include forcefield parameters
+#include "trappeua.ff/forcefield.itp"
+#include "trappeua.ff/hydrocarbons/NEWMOLECULENAME.itp"
+
+[ system ]
+; Name
+NEWMOLECULENAME
+
+[ molecules ]
+; Compound     #mols
+NEWMOLECULENAME      1000
