@@ -44,6 +44,5 @@ ref_t                   = TEMPERATURE    ; reference temperature, one for each g
 constraints             = all-angles   ; bonds involving H are constrained
 rcoulomb                = 1.4       ; short-range electrostatic cutoff (in nm)
 rvdw                    = 1.4       ; short-range van der Waals cutoff (in nm)
-coulombtype             = PME       ; Particle Mesh Ewald for long-range electrostatics
-fourierspacing          = 0.1     ; grid spacing for FFT
+coulombtype             = cut-off   ; No charges
 

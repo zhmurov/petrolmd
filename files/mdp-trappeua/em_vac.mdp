@@ -8,7 +8,7 @@ nstenergy   = 500    ; save energies every 1.0 ps, so we can observe if we are s
 nstxout-compressed       = 500    ; for writing coords (x) 
 nsteps      = -1     ; run as long as we need
 ; Settings that make sure we run with parameters in harmony with the selected force-field
-constraints             = all-angles    ; all angles are constrained
+constraints             = none          ; no constraints
 rcoulomb                = 10            ; short-range electrostatic cutoff (in nm)
 rvdw                    = 10            ; short-range van der Waals cutoff (in nm)
 coulombtype             = Cut-Off       ; Cutoff electrostatics with large radii

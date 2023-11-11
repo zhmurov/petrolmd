@@ -4,5 +4,5 @@ output conf.pdb
 
 structure ../FORCEFIELD.ff/hydrocarbons/NEWMOLECULENAME.pdb
 number 1000 
-inside box 0. 0. 0. 200. 200. 200. 
+inside box 0. 0. 0. 60. 60. 60. 
 end structure

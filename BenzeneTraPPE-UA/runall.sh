@@ -13,8 +13,9 @@ cp -r ${CHARMM36FFHOME}/charmm36.ff .
 cp -r ${TRAPPEUAFFHOME}/trappeua.ff .
 
 systems="C6H6"
-# temperatures="260 270 280 290 300 310 320"
-temperatures="260"
+temperatures="200 220 240 260 280 300 320"
+#temperatures="260 270 280 290 300 310 320"
+#temperatures="260"
 
 forcefield=$1
 
@@ -44,7 +45,7 @@ for name in $systems; do
 
     $PACKMOL < packmol.inp
     
-    $GMX editconf -f conf.pdb -o conf.gro -box 10 10 10
+    $GMX editconf -f conf.pdb -o conf.gro -box 6 6 6
     $GMX grompp -f em.mdp -c conf.gro -o em.tpr -maxwarn 1
     $GMX mdrun -deffnm em
 
